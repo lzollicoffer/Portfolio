@@ -1406,7 +1406,7 @@
 
         <!-- Book 4: Dark Matter -->
         <div class="book-slot" data-book="3">
-          <button class="book-spine" aria-expanded="false" aria-controls="book-detail-3" style="background:#3a3a3a; height:169px; width:33px;">
+          <button class="book-spine" aria-expanded="false" aria-controls="book-detail-3" style="background:#3a3a3a; height:169px; width:40px;">
             <div class="book-spine-top" style="background:#222; height:4px;"></div>
             <div class="book-spine-body" style="flex:1;">
               <span class="book-spine-title" style="color:#fff;">Dark Matter</span>
@@ -1584,7 +1584,7 @@
             <div class="book-spine-top" style="background:rgba(111,104,88,0.95); height:5px;"></div>
             <div class="book-spine-body" style="flex:1;">
               <span class="book-spine-title" style="color:#fff8f6;">LIGHT BRINGER</span>
-              <span class="book-spine-author" style="color:#fff;">Peirce Brown</span>
+              <span class="book-spine-author" style="color:#fff;">Pierce Brown</span>
             </div>
             <div class="book-spine-bottom" style="background:rgba(111,104,88,0.95); height:4px;"></div>
           </button>
@@ -2166,87 +2166,91 @@
   <script>
   (function () {
     /* ── Book data ─────────────────────────────────────────────────
-       Descriptions are intentionally long placeholders (~3 sentences)
-       to test that text never clips. Replace with real copy later.
+       Edit the title, author, category, and desc fields below.
+       · title / author / desc: use any text, including apostrophes,
+         quotes, and em dashes — they render correctly via textContent.
+       · category: formatted as TERM ONE · TERM TWO (uppercase, · sep).
+       · Do NOT change the array length or index order — each entry
+         maps to its spine by position (book-slot[data-book=N]).
     ──────────────────────────────────────────────────────────────── */
     var books = [
       {
-        title: 'Thinking, Fast and Slow',
-        author: 'Daniel Kahneman',
+        title:    'Thinking, Fast and Slow',
+        author:   'Daniel Kahneman',
         category: 'PSYCHOLOGY · BEHAVIORAL ECONOMICS',
-        desc: 'Kahneman unpacks the two systems that drive how we think — fast and intuitive vs. slow and deliberate — and the biases that trip us up in everyday decisions. Changed how I approach problem framing in design.'
+        desc:     'A fascinating look at the mental shortcuts, biases, and little lies our brains tell us.'
       },
       {
-        title: 'Beyond Good and Evil',
-        author: 'Friedrich Nietzsche',
+        title:    'Beyond Good and Evil',
+        author:   'Nietzsche',
         category: 'PHILOSOPHY · ETHICS',
-        desc: 'Nietzsche challenges the assumption that conventional morality is objective truth and dares you to examine the values you\'ve inherited rather than chosen. Dense and rewarding — best read slowly, in small doses.'
+        desc:     '"The charm of knowledge would be slight, if there were not so much embarrassment to overcome on the route to knowledge."'
       },
       {
-        title: 'Babel',
-        author: 'R.F. Kuang',
-        category: 'FICTION · HISTORICAL FANTASY',
-        desc: 'An alternate-history Oxford novel where translation is literal magic and colonialism powers it all. Kuang writes with fury and precision — the academic world feels both cosy and deeply sinister. I finished it in two sittings.'
+        title:    'Babel',
+        author:   'RF Kuang',
+        category: 'HISTORICAL FANTASY · LINGUISTICS',
+        desc:     'Devastating and incredibly relevant'
       },
       {
-        title: 'Dark Matter',
-        author: 'Blake Crouch',
-        category: 'FICTION · SCIENCE FICTION',
-        desc: 'A propulsive thriller built on the many-worlds interpretation of quantum mechanics. The science is hand-wavy but the emotional stakes land hard. Great for a weekend when you want your brain to run a little too fast.'
+        title:    'Dark Matter',
+        author:   'Blake Crouch',
+        category: 'SCIENCE FICTION · PHILOSOPHY',
+        desc:     "The most beautiful mindf*ck I've had the pleasure of experiencing"
       },
       {
-        title: 'Inferno',
-        author: 'Dante Alighieri',
-        category: 'POETRY · PHILOSOPHY',
-        desc: 'Dante walks through Hell guided by Virgil, and the 14th-century allegory reads as sharp commentary on power and corruption. The imagery is wild and specific in a way only religious terror can produce.'
+        title:    'Inferno',
+        author:   'Dante Alighieri',
+        category: 'POETRY · THEOLOGY',
+        desc:     'An absolutely stunning descent into hell that I try to embark on annually'
       },
       {
-        title: 'Whistling Vivaldi',
-        author: 'Claude M. Steele',
-        category: 'PSYCHOLOGY · RACE',
-        desc: 'Steele\'s research on stereotype threat — the idea that awareness of a stereotype can undermine performance, even without believing it — is some of the most important social psychology in decades. Essential for anyone designing products for diverse audiences.'
+        title:    'Whistling Vivaldi',
+        author:   'Claude M Steele',
+        category: 'PSYCHOLOGY · SOCIOLOGY',
+        desc:     'A poignant look at how stereotypes can become self-fulfilling obstacles, even for those who are excellent.'
       },
       {
-        title: 'The Fifth Season',
-        author: 'N.K. Jemisin',
-        category: 'FICTION · FANTASY',
-        desc: 'One of the most formally inventive fantasy novels I\'ve read — uses second person in a way that feels earned, not gimmicky. The worldbuilding is merciless and the metaphors for systemic oppression are never subtle. Won the Hugo for good reason.'
+        title:    'The Fifth Season',
+        author:   'N.K. Jemisin',
+        category: 'FANTASY · SOCIAL COMMENTARY',
+        desc:     'Just a damn good book'
       },
       {
-        title: 'The Design of Everyday Things',
-        author: 'Don Norman',
-        category: 'DESIGN · COGNITIVE SCIENCE',
-        desc: 'The book that gave us "affordances" and "discoverability" as design vocabulary. Norman\'s examples of bad door handles and confusing stove controls are still the best illustrations of why design is never just aesthetics. Classic for a reason.'
+        title:    'The Design of Everyday Things',
+        author:   'Don Norman',
+        category: 'DESIGN · COGNITIVE PSYCHOLOGY',
+        desc:     "Are you really a designer if you haven't read this?"
       },
       {
-        title: 'Continuous Discovery Habits',
-        author: 'Teresa Torres',
+        title:    'Continuous Discovery Habits',
+        author:   'Teresa Torres',
         category: 'PRODUCT · UX RESEARCH',
-        desc: 'Torres makes a compelling case that discovery isn\'t a phase before building — it\'s a continuous practice woven into the work itself. The opportunity solution tree is immediately actionable. Most practically useful product thinking book I\'ve read.'
+        desc:     'How to build products FOR your users with less guessing.'
       },
       {
-        title: 'White Nights',
-        author: 'Fyodor Dostoevsky',
-        category: 'FICTION · LITERARY',
-        desc: 'A short, melancholy novella about a dreamer who falls in love over four nights in St. Petersburg. Dostoevsky at his most tender — none of the grand suffering of his longer work, just a quiet ache. I reread it every winter.'
+        title:    'White Nights',
+        author:   'Fyodor Dostoevsky',
+        category: 'FICTION · EXISTENTIALISM',
+        desc:     'A gentle reminder to stop living in your head and start living in the moment'
       },
       {
-        title: 'The Invisible Life of Addie LaRue',
-        author: 'V.E. Schwab',
-        category: 'FICTION · FANTASY',
-        desc: 'Addie makes a deal to live forever but be forgotten by everyone she meets. Schwab turns this into a meditation on memory, identity, and what it means to leave a mark on the world. One of those books I kept putting down just to sit with.'
+        title:    'Addie LaRue',
+        author:   'VE Schwab',
+        category: 'FANTASY · EXISTENTIALISM',
+        desc:     "A book that found words for feelings I didn't even know I had"
       },
       {
-        title: 'Mismatch',
-        author: 'Kat Holmes',
-        category: 'DESIGN · INCLUSION',
-        desc: 'Holmes reframes accessibility as the central challenge of design — the people most excluded are almost always those whose needs would make the product better for everyone. Short, sharp, and genuinely changed how I think about edge cases.'
+        title:    'Mismatch: How Inclusion Shapes Design',
+        author:   'Kat Holmes',
+        category: 'DESIGN · ACCESSIBILITY',
+        desc:     'Points out how designing for a mythical average human fails and can exclude millions of people'
       },
       {
-        title: 'Light Bringer',
-        author: 'Pierce Brown',
-        category: 'FICTION · SCIENCE FICTION',
-        desc: 'The sixth book in the Red Rising saga and arguably the best since the original trilogy — Brown finds a new gear after a couple of slower middle entries. If you\'re already in the series, this is the payoff book.'
+        title:    'Light Bringer',
+        author:   'Pierce Brown',
+        category: 'SCIENCE FICTION · FANTASY',
+        desc:     'My favorite book in my favorite series, I will not be taking questions'
       }
     ];
 
