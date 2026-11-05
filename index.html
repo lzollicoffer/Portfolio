@@ -26,6 +26,7 @@
       --pad-v-desktop:    61px;
       --content-width:    1136px;
       --nav-width:        700px;
+      --breakpoint:       desktop; /* read by JS via getComputedStyle */
     }
 
     /* =============================================
@@ -785,6 +786,8 @@
        TABLET BREAKPOINT  (≤776px — Figma tablet frame width)
        ============================================= */
     @media (max-width: 776px) {
+      :root { --breakpoint: tablet; }
+
       .page-wrapper {
         padding: 40px 16px;
         gap: 24px;
@@ -888,6 +891,8 @@
        MOBILE BREAKPOINT  (≤383px — Figma mobile frame width)
        ============================================= */
     @media (max-width: 430px) {
+      :root { --breakpoint: mobile; }
+
       .page-wrapper {
         padding: 40px 16px;
         gap: 16px;
@@ -984,6 +989,39 @@
 
       /* Bookshelf */
       .bookshelf-row { gap: 4px; }
+    }
+    /* =============================================
+       RECORD PLAYER — SPIN + SWAP
+       ============================================= */
+    @keyframes record-spin {
+      to { transform: rotate(360deg); }
+    }
+    /* Platter fills the record div; spin applies here so it never
+       conflicts with the swap transform on the parent .record */
+    .record-platter {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+    }
+    .record-platter.spinning {
+      animation: record-spin 3s linear infinite;
+    }
+    .record-platter.paused {
+      animation-play-state: paused;
+    }
+    /* Clip exiting record at container edge */
+    .record-stack { overflow: hidden; }
+    /* Exit: front record slides right and fades */
+    .record.is-exiting {
+      transform: translateX(130%) rotate(15deg);
+      opacity: 0;
+      transition: transform 0.38s ease-in, opacity 0.32s ease-in;
+      z-index: 10 !important;
+    }
+    /* Shift: other records spring to new slot positions */
+    .record.is-shifting {
+      transition: left 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  top  0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
   </style>
 </head>
@@ -1300,68 +1338,82 @@
         <!-- Stacked vinyl records — DOM order = z-order (first=back, last=front) -->
         <div class="record-stack">
           <!-- Record 1 — back, left=0 top=0 -->
-          <div class="record record-1">
-            <img class="record-label" src="assets/stacked_record1.png" alt="Vinyl record" />
-            <img class="record-sheen" src="assets/sheen.png" alt="" />
-            <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
-            <img class="record-hub" src="assets/hub.svg" alt="" />
-            <img class="record-hubring" src="assets/hubring.svg" alt="" />
-            <img class="record-hole" src="assets/hole.svg" alt="" />
+          <div class="record record-1" data-idx="0">
+            <div class="record-platter">
+              <img class="record-label" src="assets/stacked_record1.png" alt="Vinyl record" />
+              <img class="record-sheen" src="assets/sheen.png" alt="" />
+              <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
+              <img class="record-hub" src="assets/hub.svg" alt="" />
+              <img class="record-hubring" src="assets/hubring.svg" alt="" />
+              <img class="record-hole" src="assets/hole.svg" alt="" />
+            </div>
           </div>
           <!-- Record 7 — 2nd from back, same position as record 1, reflection overlay -->
-          <div class="record record-7">
-            <img class="record-label" src="assets/stacked_record7.png" alt="Vinyl record" />
-            <img class="record-sheen" src="assets/sheen.png" alt="" />
-            <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
-            <img class="record-hub" src="assets/hub.svg" alt="" />
-            <img class="record-hubring" src="assets/hubring.svg" alt="" />
-            <img class="record-hole" src="assets/hole.svg" alt="" />
-            <img class="record-reflection" src="assets/reflection_fixed.png" alt="" />
+          <div class="record record-7" data-idx="1">
+            <div class="record-platter">
+              <img class="record-label" src="assets/stacked_record7.png" alt="Vinyl record" />
+              <img class="record-sheen" src="assets/sheen.png" alt="" />
+              <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
+              <img class="record-hub" src="assets/hub.svg" alt="" />
+              <img class="record-hubring" src="assets/hubring.svg" alt="" />
+              <img class="record-hole" src="assets/hole.svg" alt="" />
+              <img class="record-reflection" src="assets/reflection_fixed.png" alt="" />
+            </div>
           </div>
           <!-- Record 2 — left=17.3px top=6px -->
-          <div class="record record-2">
-            <img class="record-label" src="assets/stacked_record2.png" alt="Vinyl record" />
-            <img class="record-sheen" src="assets/sheen.png" alt="" />
-            <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
-            <img class="record-hub" src="assets/hub.svg" alt="" />
-            <img class="record-hubring" src="assets/hubring.svg" alt="" />
-            <img class="record-hole" src="assets/hole.svg" alt="" />
+          <div class="record record-2" data-idx="2">
+            <div class="record-platter">
+              <img class="record-label" src="assets/stacked_record2.png" alt="Vinyl record" />
+              <img class="record-sheen" src="assets/sheen.png" alt="" />
+              <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
+              <img class="record-hub" src="assets/hub.svg" alt="" />
+              <img class="record-hubring" src="assets/hubring.svg" alt="" />
+              <img class="record-hole" src="assets/hole.svg" alt="" />
+            </div>
           </div>
           <!-- Record 3 — left=34.6px top=12px -->
-          <div class="record record-3">
-            <img class="record-label" src="assets/stacked_record3.png" alt="Vinyl record" />
-            <img class="record-sheen" src="assets/sheen.png" alt="" />
-            <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
-            <img class="record-hub" src="assets/hub.svg" alt="" />
-            <img class="record-hubring" src="assets/hubring.svg" alt="" />
-            <img class="record-hole" src="assets/hole.svg" alt="" />
+          <div class="record record-3" data-idx="3">
+            <div class="record-platter">
+              <img class="record-label" src="assets/stacked_record3.png" alt="Vinyl record" />
+              <img class="record-sheen" src="assets/sheen.png" alt="" />
+              <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
+              <img class="record-hub" src="assets/hub.svg" alt="" />
+              <img class="record-hubring" src="assets/hubring.svg" alt="" />
+              <img class="record-hole" src="assets/hole.svg" alt="" />
+            </div>
           </div>
           <!-- Record 4 — left=51.9px top=18px -->
-          <div class="record record-4">
-            <img class="record-label" src="assets/stacked_record4.png" alt="Vinyl record" />
-            <img class="record-sheen" src="assets/sheen.png" alt="" />
-            <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
-            <img class="record-hub" src="assets/hub.svg" alt="" />
-            <img class="record-hubring" src="assets/hubring.svg" alt="" />
-            <img class="record-hole" src="assets/hole.svg" alt="" />
+          <div class="record record-4" data-idx="4">
+            <div class="record-platter">
+              <img class="record-label" src="assets/stacked_record4.png" alt="Vinyl record" />
+              <img class="record-sheen" src="assets/sheen.png" alt="" />
+              <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
+              <img class="record-hub" src="assets/hub.svg" alt="" />
+              <img class="record-hubring" src="assets/hubring.svg" alt="" />
+              <img class="record-hole" src="assets/hole.svg" alt="" />
+            </div>
           </div>
           <!-- Record 5 — left=69.2px top=24px -->
-          <div class="record record-5">
-            <img class="record-label" src="assets/stacked_record5.png" alt="Vinyl record" />
-            <img class="record-sheen" src="assets/sheen.png" alt="" />
-            <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
-            <img class="record-hub" src="assets/hub.svg" alt="" />
-            <img class="record-hubring" src="assets/hubring.svg" alt="" />
-            <img class="record-hole" src="assets/hole.svg" alt="" />
+          <div class="record record-5" data-idx="5">
+            <div class="record-platter">
+              <img class="record-label" src="assets/stacked_record5.png" alt="Vinyl record" />
+              <img class="record-sheen" src="assets/sheen.png" alt="" />
+              <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
+              <img class="record-hub" src="assets/hub.svg" alt="" />
+              <img class="record-hubring" src="assets/hubring.svg" alt="" />
+              <img class="record-hole" src="assets/hole.svg" alt="" />
+            </div>
           </div>
           <!-- Record 6 — FRONT, left=86.5px top=30px -->
-          <div class="record record-6">
-            <img class="record-label" src="assets/stacked_record6.png" alt="Vinyl record" />
-            <img class="record-sheen" src="assets/sheen.png" alt="" />
-            <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
-            <img class="record-hub" src="assets/hub.svg" alt="" />
-            <img class="record-hubring" src="assets/hubring.svg" alt="" />
-            <img class="record-hole" src="assets/hole.svg" alt="" />
+          <div class="record record-6" data-idx="6">
+            <div class="record-platter">
+              <img class="record-label" src="assets/stacked_record6.png" alt="Vinyl record" />
+              <img class="record-sheen" src="assets/sheen.png" alt="" />
+              <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
+              <img class="record-hub" src="assets/hub.svg" alt="" />
+              <img class="record-hubring" src="assets/hubring.svg" alt="" />
+              <img class="record-hole" src="assets/hole.svg" alt="" />
+            </div>
           </div>
         </div>
 
@@ -1472,6 +1524,300 @@
         });
       });
     })();
+  </script>
+  <script>
+  (function () {
+    /* ── Song data ──────────────────────────────────────────
+       7 placeholder entries — one per record image.
+       Images are ordered so the initial front (slot 6) shows
+       stacked_record6.png, slot 5 shows stacked_record5.png, etc.
+       Replace title/artist/year/duration with real data later.
+    ─────────────────────────────────────────────────────── */
+    var songs = [
+      { title: "Nothing's Gonna Hurt You Baby", artist: 'Cigarettes After Sex', year: '2012', duration: 231, img: 'stacked_record6.png' },
+      { title: 'Placeholder Song 2',            artist: 'Artist Two',           year: '2020', duration: 198, img: 'stacked_record5.png' },
+      { title: 'Placeholder Song 3',            artist: 'Artist Three',         year: '2018', duration: 243, img: 'stacked_record4.png' },
+      { title: 'Placeholder Song 4',            artist: 'Artist Four',          year: '2021', duration: 215, img: 'stacked_record3.png' },
+      { title: 'Placeholder Song 5',            artist: 'Artist Five',          year: '2019', duration: 187, img: 'stacked_record2.png' },
+      { title: 'Placeholder Song 6',            artist: 'Artist Six',           year: '2017', duration: 222, img: 'stacked_record1.png' },
+      { title: 'Placeholder Song 7',            artist: 'Artist Seven',         year: '2022', duration: 204, img: 'stacked_record7.png' },
+    ];
+
+    /* ── Position tables ────────────────────────────────────
+       Tablet (≤776px) has no record-position overrides in CSS,
+       so it reuses desktop values. Mobile (≤430px) has its own.
+       JS reads --breakpoint custom property set by CSS media
+       queries — no pixel values hardcoded here.
+    ─────────────────────────────────────────────────────── */
+    var POS = {
+      desktop: [
+        { left: 0,     top: 0,  z: 1 },
+        { left: 0,     top: 0,  z: 2 },
+        { left: 17.3,  top: 6,  z: 3 },
+        { left: 34.6,  top: 12, z: 4 },
+        { left: 51.9,  top: 18, z: 5 },
+        { left: 69.2,  top: 24, z: 6 },
+        { left: 86.5,  top: 30, z: 7 },
+      ],
+      mobile: [
+        { left: 0,      top: 0,     z: 1 },
+        { left: 0,      top: 0,     z: 2 },
+        { left: 13.66,  top: 4.74,  z: 3 },
+        { left: 27.31,  top: 9.47,  z: 4 },
+        { left: 40.97,  top: 14.21, z: 5 },
+        { left: 54.62,  top: 18.95, z: 6 },
+        { left: 68.28,  top: 23.68, z: 7 },
+      ],
+    };
+    /* Tablet reuses desktop positions — confirmed: CSS has no
+       record-position overrides in the 776px breakpoint block. */
+    POS.tablet = POS.desktop;
+
+    function getPos() {
+      var bp = getComputedStyle(document.documentElement)
+                 .getPropertyValue('--breakpoint').trim().replace(/['"]/g, '');
+      return POS[bp] || POS.desktop;
+    }
+
+    /* ── DOM refs ────────────────────────────────────────── */
+    var stackEl      = document.querySelector('.record-stack');
+    /* Collect in DOM order: data-idx 0-6 */
+    var recordEls    = Array.from(stackEl.querySelectorAll('.record'))
+                        .sort(function (a, b) {
+                          return +a.dataset.idx - +b.dataset.idx;
+                        });
+    var titleEl      = document.querySelector('.track-title');
+    var artistEl     = document.querySelector('.track-artist');
+    var fillEl       = document.querySelector('.progress-bar-fill');
+    var timeLeftEl   = document.querySelector('.progress-times span:first-child');
+    var timeRightEl  = document.querySelector('.progress-times span:last-child');
+    var playBtn      = document.querySelector('.play-btn');
+    var prevBtn      = document.querySelector('.music-controls img:first-child');
+    var nextBtn      = document.querySelector('.music-controls img:last-child');
+
+    /* ── State ───────────────────────────────────────────── */
+    /* slots[i] = slot number (0=back … 6=front) for recordEls[i].
+       Initial DOM order already matches slot order 0-6.         */
+    var slots      = [0, 1, 2, 3, 4, 5, 6];
+    /* slotSong[slot] = index into songs[].
+       Slot 6 (front) starts with song 0 (stacked_record6.png).  */
+    var slotSong   = [6, 5, 4, 3, 2, 1, 0];
+    var isPlaying  = false;
+    var isBusy     = false;
+    var progSec    = 0;
+    var timerId    = null;
+
+    /* ── Helpers ─────────────────────────────────────────── */
+    function frontEl() {
+      return recordEls[slots.indexOf(6)];
+    }
+    function currentSong() {
+      return songs[slotSong[6]];
+    }
+    function fmt(s) {
+      s = Math.floor(s);
+      return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2);
+    }
+
+    /* ── Position application ─────────────────────────────── */
+    function applyPos(animateIndices) {
+      var pos = getPos();
+      recordEls.forEach(function (el, i) {
+        if (animateIndices && animateIndices.indexOf(i) !== -1) {
+          el.classList.add('is-shifting');
+        }
+        el.style.left   = pos[slots[i]].left + 'px';
+        el.style.top    = pos[slots[i]].top  + 'px';
+        el.style.zIndex = pos[slots[i]].z;
+      });
+    }
+
+    /* Snap one record to a slot with no transition */
+    function snapToSlot(el, slot) {
+      var idx = recordEls.indexOf(el);
+      el.classList.remove('is-shifting', 'is-exiting');
+      slots[idx] = slot;
+      var p = getPos()[slot];
+      el.style.left   = p.left + 'px';
+      el.style.top    = p.top  + 'px';
+      el.style.zIndex = p.z;
+    }
+
+    /* ── Initial render ───────────────────────────────────── */
+    applyPos([]);
+
+    /* ── Spin ─────────────────────────────────────────────── */
+    function platterOf(el) {
+      return el.querySelector('.record-platter');
+    }
+    function spinOn() {
+      platterOf(frontEl()).classList.add('spinning');
+      platterOf(frontEl()).classList.remove('paused');
+    }
+    function spinPause() {
+      platterOf(frontEl()).classList.add('paused');
+    }
+    function clearAllSpin() {
+      recordEls.forEach(function (el) {
+        platterOf(el).classList.remove('spinning', 'paused');
+      });
+    }
+
+    /* ── Progress ─────────────────────────────────────────── */
+    function updateBar() {
+      var song = currentSong();
+      var pct  = Math.min(progSec / song.duration, 1);
+      fillEl.style.width      = (pct * 100) + '%';
+      timeLeftEl.textContent  = fmt(progSec);
+      timeRightEl.textContent = fmt(song.duration);
+    }
+    function resetProg() {
+      clearInterval(timerId); timerId = null;
+      progSec = 0; updateBar();
+    }
+    function startTimer() {
+      clearInterval(timerId);
+      timerId = setInterval(function () {
+        progSec++;
+        if (progSec >= currentSong().duration) { go(1); return; }
+        updateBar();
+      }, 1000);
+    }
+
+    /* ── Track info ───────────────────────────────────────── */
+    function updateUI() {
+      var s = currentSong();
+      titleEl.textContent  = s.title;
+      artistEl.textContent = s.artist + ' \u00b7 ' + s.year;
+      resetProg();
+      if (isPlaying) startTimer();
+      updateBar();
+    }
+
+    /* ── Swap animation ───────────────────────────────────── */
+    var SWAP_MS = 450;
+
+    function go(dir) {
+      if (isBusy) return;
+      isBusy = true;
+
+      var fIdx = slots.indexOf(6);
+      var fEl  = recordEls[fIdx];
+
+      /* For prev: pre-load the target song into slot 5 so it
+         becomes the new front after the rotation below.        */
+      if (dir < 0) {
+        var prevSongIdx = (slotSong[6] - 1 + songs.length) % songs.length;
+        /* Find which record is at slot 5 and update its image now
+           (it's nearly hidden, so the swap is invisible)        */
+        var slot5Idx = slots.indexOf(5);
+        recordEls[slot5Idx].querySelector('.record-label').src =
+          'assets/' + songs[prevSongIdx].img;
+        slotSong[5] = prevSongIdx;
+      }
+
+      /* 1. Exit front record */
+      fEl.classList.add('is-exiting');
+
+      /* 2. Shift all other records up one slot */
+      var shifting = [];
+      recordEls.forEach(function (el, i) {
+        if (i === fIdx) return;
+        slots[i] = Math.min(slots[i] + 1, 6);
+        shifting.push(i);
+      });
+      applyPos(shifting);
+
+      /* 3. Rotate slotSong: front song goes to back */
+      var exitSong = slotSong[6];
+      for (var s = 6; s > 0; s--) slotSong[s] = slotSong[s - 1];
+      slotSong[0] = exitSong;
+
+      /* 4. After animation: settle exiting record to back */
+      setTimeout(function () {
+        recordEls.forEach(function (el) { el.classList.remove('is-shifting'); });
+        snapToSlot(fEl, 0);
+
+        /* Update new front record's label image */
+        var newFrontEl = recordEls[slots.indexOf(6)];
+        newFrontEl.querySelector('.record-label').src =
+          'assets/' + songs[slotSong[6]].img;
+
+        /* Update spin to new front */
+        clearAllSpin();
+        if (isPlaying) spinOn();
+
+        updateUI();
+        isBusy = false;
+      }, SWAP_MS);
+    }
+
+    /* ── Click-to-front ───────────────────────────────────── */
+    recordEls.forEach(function (el) {
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', function () {
+        var clickedIdx  = recordEls.indexOf(el);
+        var clickedSlot = slots[clickedIdx];
+        if (clickedSlot === 6 || isBusy) return; /* already front */
+
+        isBusy = true;
+
+        /* Rotate slots: clicked slot → 6, slots above it → shift down */
+        var newSlots = slots.slice();
+        recordEls.forEach(function (_, i) {
+          if (slots[i] > clickedSlot) newSlots[i] = slots[i] - 1;
+        });
+        newSlots[clickedIdx] = 6;
+        slots = newSlots;
+
+        /* Rotate slotSong the same way */
+        var newSlotSong = slotSong.slice();
+        for (var s = clickedSlot; s < 6; s++) newSlotSong[s] = slotSong[s + 1];
+        newSlotSong[6] = slotSong[clickedSlot];
+        slotSong = newSlotSong;
+
+        /* Animate */
+        var shifting = recordEls.map(function (_, i) { return i; });
+        applyPos(shifting);
+
+        setTimeout(function () {
+          recordEls.forEach(function (e) { e.classList.remove('is-shifting'); });
+          /* Update front label image */
+          recordEls[slots.indexOf(6)].querySelector('.record-label').src =
+            'assets/' + songs[slotSong[6]].img;
+          clearAllSpin();
+          if (isPlaying) spinOn();
+          updateUI();
+          isBusy = false;
+        }, SWAP_MS);
+      });
+    });
+
+    /* ── Play / pause ─────────────────────────────────────── */
+    playBtn.addEventListener('click', function () {
+      isPlaying = !isPlaying;
+      playBtn.setAttribute('aria-label', isPlaying ? 'Pause' : 'Play');
+      playBtn.style.opacity = isPlaying ? '1' : '0.6';
+      if (isPlaying) { spinOn(); startTimer(); }
+      else           { spinPause(); clearInterval(timerId); timerId = null; }
+    });
+
+    /* ── Next / Prev ──────────────────────────────────────── */
+    nextBtn.addEventListener('click', function () { go(1);  });
+    prevBtn.addEventListener('click', function () { go(-1); });
+
+    /* ── Re-apply positions on resize ─────────────────────── */
+    var resizeTimer;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () { applyPos([]); }, 150);
+    });
+
+    /* ── Init ─────────────────────────────────────────────── */
+    updateUI();
+    /* Start with play button visually dimmed (paused state) */
+    playBtn.style.opacity = '0.6';
+  })();
   </script>
 </body>
 </html>
