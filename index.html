@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lexxiana Zollicoffer — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;700;800&family=Outfit:wght@300;500&display=swap" rel="stylesheet" />
+  <style>
+    /* =============================================
+       DESIGN TOKENS
+       ============================================= */
+    :root {
+      --bg-page:          #fcfaf6;
+      --bg-card:          #ffffff;
+      --border-card:      #bfbfbf;
+      --text-dark:        #343c35;
+      --text-muted:       #596254;
+      --text-muted2:      #6e7366;
+      --shadow-card:      0px 16px 16px rgba(12,12,13,0.1), 0px 4px 2px rgba(12,12,13,0.05);
+      --radius-card:      30px;
+      --radius-nav:       51px;
+      --gap-section:      40px;
+      --pad-h-desktop:    180px;
+      --pad-v-desktop:    61px;
+      --content-width:    1136px;
+      --nav-width:        700px;
+    }
+
+    /* =============================================
+       RESET & BASE
+       ============================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body {
+      background: var(--bg-page);
+      color: var(--text-dark);
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+    img { display: block; max-width: 100%; }
+
+    /* =============================================
+       REDUCED MOTION STUB
+       ============================================= */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    /* =============================================
+       LAYOUT WRAPPER
+       ============================================= */
+    .page-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--gap-section);
+      padding: 61px clamp(24px, calc((100vw - 1136px) / 2), 180px);
+    }
+
+    /* =============================================
+       CARD BASE
+       ============================================= */
+    .card {
+      background: var(--bg-card);
+      border: 0.5px solid var(--border-card);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+    }
+
+    /* =============================================
+       NAV
+       ============================================= */
+    /* Sticky wrapper — sits above page content, centers the pill */
+    .sticky-nav {
+      position: sticky;
+      top: 20px;
+      z-index: 100;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .nav-pill {
+      pointer-events: auto;
+      position: relative;
+      background: var(--bg-card);
+      border-radius: var(--radius-nav);
+      box-shadow: var(--shadow-card);
+      width: min(700px, 100%);
+      display: flex;
+      align-items: stretch;
+      justify-content: space-between;
+      padding: 0;
+      overflow: hidden; /* clips indicator to pill shape at edges */
+    }
+
+    .nav-pill a {
+      /* Accordion: each link is a flex item that grows/shrinks */
+      flex-grow: 1;
+      flex-shrink: 1;
+      flex-basis: 0;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 18px;
+      line-height: 1.55;
+      color: var(--text-muted);
+      text-decoration: none;
+      white-space: nowrap;
+      padding: 14px 8px;
+      border-radius: 111px;
+      background: transparent;
+      /* Animate the expansion, fill, and color together */
+      transition: flex-grow     0.4s cubic-bezier(0.34, 1.4, 0.64, 1),
+                  background    0.3s ease,
+                  color         0.25s ease;
+    }
+
+    /* Active item: 278px out of 700px nav
+       flex-grow: 1.98 → 1.98/(1.98+3) * 700 = 278.3px */
+    .nav-pill a.active {
+      flex-grow: 1.98;
+      background: rgba(120,120,128,0.16);
+      color: var(--text-dark);
+    }
+
+    .nav-pill a:hover:not(.active) { color: var(--text-dark); }
+
+    .nav-pill a:focus-visible {
+      outline: 2px solid var(--text-dark);
+      outline-offset: -3px;
+    }
+
+    /* Respect reduced-motion: cut the bounce, keep the color/fill */
+    @media (prefers-reduced-motion: reduce) {
+      .nav-pill a { transition: background 0.15s ease, color 0.15s ease; }
+    }
+
+    /* Short labels — hidden by default, shown only on mobile */
+    .nav-short { display: none; }
+
+    /* Scroll offset so sections aren't hidden under sticky nav */
+    #about, #work, #hot-takes, #just-fun { scroll-margin-top: 80px; }
+
+    /* =============================================
+       CONTENT ROWS
+       ============================================= */
+    .content-width {
+      max-width: 1136px;
+      width: 100%;
+    }
+    .row-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--gap-section);
+    }
+    .row-4col {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--gap-section);
+    }
+
+    /* =============================================
+       HERO CARD
+       ============================================= */
+    .hero-card {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 32px;
+      padding: 24px 24px 24px 32px;
+    }
+    .hero-photo {
+      flex-shrink: 0;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+    .hero-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .hero-text {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .hero-heading {
+      font-family: 'Work Sans', sans-serif;
+      font-weight: 600;
+      font-size: 42px;
+      letter-spacing: -1.68px;
+      line-height: 1.1;
+      color: var(--text-dark);
+    }
+    .hero-subtitle {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+    .hero-body {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 18px;
+      line-height: 1.55;
+      color: var(--text-dark);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    /* =============================================
+       QUICK LINKS ROW
+       ============================================= */
+    .quick-link-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 24px;
+      min-height: 190px;
+    }
+    .quick-link-card p {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 300;
+      font-size: 14px;
+      line-height: 20px;
+      letter-spacing: 0.1px;
+      color: var(--text-dark);
+      text-align: center;
+    }
+    .quick-link-card p strong {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 500;
+    }
+    .quick-link-card img {
+      max-height: 100px;
+      max-width: 160px;
+      object-fit: contain;
+    }
+    /* When quick-link-card is an <a> tag */
+    a.quick-link-card {
+      text-decoration: none;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    a.quick-link-card:hover { opacity: 0.85; }
+    /* Gmail clipboard feedback */
+    .gmail-copy[data-copied="true"]::after {
+      content: 'Copied!';
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      background: #343c35;
+      color: #fff;
+      padding: 3px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /* =============================================
+       HOT TAKES CARDS
+       ============================================= */
+    .hot-takes-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 32px;
+      min-height: 190px;
+    }
+    .hot-takes-title {
+      font-family: 'Work Sans', sans-serif;
+      font-weight: 600;
+      font-size: 24px;
+      letter-spacing: -0.96px;
+      line-height: 1.1;
+      color: var(--text-dark);
+      text-align: center;
+    }
+    .hot-takes-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 400;
+      font-size: 18px;
+      line-height: 1.5;
+      color: var(--text-muted);
+      text-align: center;
+    }
+    .expand-icon {
+      position: absolute;
+      top: 35.5px;
+      right: 35.5px;
+      width: 24px;
+      height: 24px;
+    }
+
+    /* =============================================
+       WORK PLACEHOLDER CARDS
+       ============================================= */
+    .work-placeholder-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 24px 32px;
+      min-height: 495px;
+      border-style: dashed;
+    }
+    .work-placeholder-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 300;
+      font-size: 40px;
+      line-height: 1.0;
+      color: #000;
+      text-align: center;
+      letter-spacing: 0.1px;
+    }
+    .work-placeholder-label {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 300;
+      font-size: 18px;
+      line-height: 1.3;
+      color: #000;
+      text-align: center;
+      opacity: 0.5;
+      font-style: italic;
+    }
+
+    /* =============================================
+       AI MEET THE FED CARD
+       — exact Figma measurements: card 548×495px
+       ============================================= */
+    .ai-fed-card {
+      position: relative;
+      overflow: hidden;
+      height: 495px;
+    }
+    /* Martin illustration container: left:62.5px, top:-21.5px, 525×516px */
+    .ai-fed-card .martin-container {
+      position: absolute;
+      left: 62.5px;
+      top: -21.5px;
+      width: 525px;
+      height: 516px;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    /* Image within container: left:10.44%, top:23.58%, w:79.06%, h:80.57% */
+    .ai-fed-card .martin-img {
+      position: absolute;
+      left: 10.44%;
+      top: 23.58%;
+      width: 79.06%;
+      height: 80.57%;
+      object-fit: contain;
+      object-position: top left;
+    }
+    .ai-fed-card .ai-fed-heading {
+      position: absolute;
+      left: 47.5px;
+      top: 43.5px;
+      font-family: 'Work Sans', sans-serif;
+      font-weight: 600;
+      font-size: 42px;
+      letter-spacing: -1.68px;
+      line-height: 1.1;
+      color: var(--text-dark);
+      white-space: nowrap;
+      z-index: 2;
+    }
+    /* Speech bubble: left:356.5px, top:134.5px, w:141px */
+    .ai-fed-card .martin-speech {
+      position: absolute;
+      left: 356.5px;
+      top: 134.5px;
+      width: 141px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 700;
+      font-size: 20px;
+      line-height: 1.5;
+      color: #2a5075;
+      text-align: center;
+      z-index: 3;
+    }
+
+    /* =============================================
+       BOOKSHELF CARD
+       ============================================= */
+    .bookshelf-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 25px;
+      padding: 32px 24px 32px 32px;
+    }
+    .bookshelf-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+    }
+    .bookshelf-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 300;
+      font-size: 32px;
+      line-height: 1.25;
+      letter-spacing: 0.1px;
+      color: #000;
+    }
+    .bookshelf-subtitle {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 500;
+      font-size: 12px;
+      letter-spacing: 0.96px;
+      line-height: normal;
+      color: var(--text-muted2);
+    }
+    /* Illustrated book spines */
+    /* Outer wrapper: flex-col so shelf always sits below books at full width */
+    .bookshelf-outer {
+      width: 100%;
+      max-width: 736px;
+      display: flex;
+      flex-direction: column;
+    }
+    .bookshelf-row {
+      width: 100%;
+      display: flex;
+      align-items: flex-end;
+      gap: 7px;
+      overflow-x: auto;
+    }
+    .book-spine {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+      border-radius: 3px 3px 0 0;
+      flex-shrink: 0;
+      cursor: default;
+    }
+    .book-spine-top {
+      width: 100%;
+      flex-shrink: 0;
+    }
+    .book-spine-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 10px 4px;
+      text-align: center;
+      width: 100%;
+    }
+    .book-spine-title {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 8px;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+    .book-spine-author {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 6px;
+      line-height: 1.2;
+    }
+    .book-spine-bottom {
+      width: 100%;
+      flex-shrink: 0;
+    }
+    /* Bookshelf wooden shelf — sibling of .bookshelf-row, not inside it */
+    .bookshelf-wood {
+      flex-shrink: 0;
+      width: 100%;
+    }
+    .shelf-top-band {
+      height: 15px;
+      background: linear-gradient(to bottom, #f5e6c8 0%, #edd9a3 40%, #e2cb90 100%);
+    }
+    .shelf-main-band {
+      height: 27px;
+      background: linear-gradient(to bottom, #d4a96a 0%, #c9974f 50%, #be8c42 100%);
+    }
+    .shelf-shadow-band {
+      height: 5px;
+      background: linear-gradient(to bottom, #a06e2c, #7a5020);
+      opacity: 0.6;
+    }
+
+    /* =============================================
+       MUSIC / ROTATION CARD
+       ============================================= */
+    .music-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      padding: 24px;
+      min-height: 616px;
+      justify-content: center;
+    }
+    .music-card-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+      width: 100%;
+    }
+    .section-title-outfit {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 300;
+      font-size: 32px;
+      line-height: 1.25;
+      letter-spacing: 0.1px;
+      color: #000;
+    }
+    .section-subtitle-mono {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 500;
+      font-size: 12px;
+      letter-spacing: 0.96px;
+      line-height: normal;
+      color: var(--text-muted2);
+    }
+    /* Stacked vinyl records — exact Figma dimensions */
+    .record-stack {
+      position: relative;
+      width: 340px;
+      height: 285px;
+      flex-shrink: 0;
+    }
+    .record {
+      position: absolute;
+      width: 248.3px;
+      height: 248.3px;
+      border-radius: 50%;
+      border: 1.24px solid rgba(255,255,255,0.75);
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.24);
+      overflow: hidden;
+    }
+    .record img.record-label {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .record img.record-sheen {
+      position: absolute;
+      top: -1.24px;
+      left: -1.24px;
+      width: 248.3px;
+      height: 248.3px;
+      pointer-events: none;
+    }
+    .record img.record-iridescent {
+      position: absolute;
+      top: 77.39px;
+      left: 77.39px;
+      width: 91.04px;
+      height: 91.04px;
+      pointer-events: none;
+    }
+    .record img.record-hub {
+      position: absolute;
+      top: 86.49px;
+      left: 86.49px;
+      width: 72.83px;
+      height: 72.83px;
+      pointer-events: none;
+    }
+    .record img.record-hubring {
+      position: absolute;
+      top: 98.08px;
+      left: 98.08px;
+      width: 49.66px;
+      height: 49.66px;
+      pointer-events: none;
+    }
+    .record img.record-hole {
+      position: absolute;
+      top: 107.18px;
+      left: 107.18px;
+      width: 31.45px;
+      height: 31.45px;
+      pointer-events: none;
+    }
+    .record img.record-reflection {
+      position: absolute;
+      left: -0.19px;
+      top: -0.98px;
+      right: -1.77px;
+      width: 196.02px; /* scaled from mobile; full record size */
+      height: 196.02px;
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+    /*
+     * Record stacking positions — from Figma code (desktop):
+     * DOM order = z-order. First listed = back (z=1), last listed = front (z=7).
+     * Records 1 & 7 share left=0, top=0. Records 2–6 offset by 17.3px / 6px per step.
+     */
+    .record-1 { left: 0px;    top: 0px;  z-index: 1; }  /* back */
+    .record-7 { left: 0px;    top: 0px;  z-index: 2; }  /* 2nd from back, same pos */
+    .record-2 { left: 17.3px; top: 6px;  z-index: 3; }
+    .record-3 { left: 34.6px; top: 12px; z-index: 4; }
+    .record-4 { left: 51.9px; top: 18px; z-index: 5; }
+    .record-5 { left: 69.2px; top: 24px; z-index: 6; }
+    .record-6 { left: 86.5px; top: 30px; z-index: 7; }  /* front */
+
+    /* Music track info */
+    .music-track-info {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .track-title {
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 15px;
+      color: var(--text-dark);
+      text-align: center;
+    }
+    .track-artist {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* Progress bar */
+    .progress-bar-wrap {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .progress-bar-track {
+      width: 100%;
+      height: 4px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 15%;
+      background: var(--text-dark);
+      border-radius: 999px;
+    }
+    .progress-times {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted2);
+    }
+
+    /* Music player controls */
+    .music-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+    }
+    .music-controls img {
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+    }
+    .music-controls img.play-btn {
+      width: 48px;
+      height: 48px;
+    }
+
+    /* =============================================
+       HYPERFIXATION CARD — POLAROID FRAMES
+       ============================================= */
+    .hyper-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      padding: 32px;
+      min-height: 616px;
+      justify-content: center;
+    }
+    .hyper-card-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+      width: 100%;
+    }
+    /* Scattered polaroid layout */
+    .polaroid-scatter {
+      position: relative;
+      width: 360px;
+      max-width: 100%;
+      min-height: 440px;
+    }
+    .polaroid {
+      position: absolute;
+      background: #fff;
+      /* equal border on 3 sides, larger at bottom — classic Polaroid */
+      padding: 10px 10px 32px 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.10);
+      border-radius: 2px;
+    }
+    .polaroid-photo {
+      width: 148px;
+      height: 148px;
+      background: #d1d5db;
+      border-radius: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .polaroid-caption {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 400;
+      font-size: 10px;
+      color: #596254;
+      text-align: center;
+      margin-top: 8px;
+      line-height: 1.4;
+      width: 148px;
+    }
+    /* Individual positions & rotations */
+    .polaroid-a { top: 0px;   left: 10px;  transform: rotate(-4deg); z-index: 1; }
+    .polaroid-b { top: 10px;  left: 180px; transform: rotate(3.5deg); z-index: 2; }
+    .polaroid-c { top: 220px; left: 0px;   transform: rotate(2deg); z-index: 3; }
+    .polaroid-d { top: 205px; left: 165px; transform: rotate(-3deg); z-index: 4; }
+
+    /* =============================================
+       SECTION GROUPING (Work + Hot Takes interleaved)
+       ============================================= */
+    .sections-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap-section);
+      max-width: 1136px;
+      width: 100%;
+    }
+
+    /* =============================================
+       TABLET BREAKPOINT  (≤776px — Figma tablet frame width)
+       ============================================= */
+    @media (max-width: 776px) {
+      .page-wrapper {
+        padding: 40px 16px;
+        gap: 24px;
+      }
+
+      /* Content containers: Figma tablet sections are 640px */
+      .content-width, .sections-group {
+        max-width: 640px;
+      }
+
+      /* Nav: fluid up to 640px — flex-grow handles proportions */
+      .nav-pill { width: min(640px, 100%); }
+      .nav-pill a { font-size: 18px; padding: 14px 8px; }
+
+      /* Hero: stack vertically, 240px photo, smaller heading */
+      .hero-card { flex-direction: column; align-items: center; }
+      .hero-photo { width: 240px; height: 240px; align-self: center; }
+      .hero-heading { font-size: 32px; letter-spacing: -1.28px; }
+      .hero-body { font-size: 16px; }
+
+      /* Row gaps: 8px between all cards per Figma */
+      .row-2col { gap: 8px; }
+      .row-4col { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .sections-group { gap: 8px; }
+
+      /* Bottom row (music + hyper) stacks to full width */
+      .bottom-row { grid-template-columns: 1fr; }
+
+      /* Quick links: exact 154px height, 20px radius */
+      .quick-link-card {
+        height: 154px;
+        min-height: unset;
+        padding: 16px;
+        border-radius: 20px;
+      }
+
+      /* Hot takes: compact, 20px radius */
+      .hot-takes-card { padding: 16px; min-height: unset; border-radius: 20px; }
+      .hot-takes-title { font-size: 16px; letter-spacing: -0.64px; }
+      .hot-takes-label { font-size: 11px; }
+      .expand-icon { width: 16px; height: 16px; top: 10.5px; right: 10px; }
+
+      /* Work cards: exact 180px height, 20px radius */
+      .work-placeholder-card {
+        height: 180px;
+        min-height: unset;
+        padding: 20px;
+        border-radius: 20px;
+      }
+      .work-placeholder-title { font-size: 18px; }
+
+      /* AI Meet the Fed: 180px, font-size 20 (robot image removed from HTML) */
+      .ai-fed-card {
+        height: 180px;
+        min-height: unset;
+        border-radius: 20px;
+      }
+      .ai-fed-card .ai-fed-heading {
+        font-size: 20px;
+        letter-spacing: -0.8px;
+        left: 20px;
+        top: 24px;
+      }
+      .ai-fed-card .martin-speech { display: none; }
+
+      /* Bookshelf: 24px radius, smaller title */
+      .bookshelf-card { border-radius: 24px; }
+      .bookshelf-title { font-size: 24px; }
+
+      /* Music card */
+      .music-card { min-height: auto; }
+
+      /* Hyperfixation: horizontal row of polaroids, container hugs content */
+      .hyper-card {
+        min-height: auto;
+        padding: 24px 20px;
+      }
+      .polaroid-scatter {
+        position: static;
+        min-height: unset;
+        width: auto;
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        justify-content: center;
+        align-items: flex-start;
+      }
+      .polaroid { position: static; }
+      .polaroid-a, .polaroid-b, .polaroid-c, .polaroid-d {
+        transform: none;
+        top: auto;
+        left: auto;
+      }
+      .polaroid-photo { width: 96px; height: 96px; }
+      .polaroid-caption { width: 96px; }
+    }
+
+    /* =============================================
+       MOBILE BREAKPOINT  (≤383px — Figma mobile frame width)
+       ============================================= */
+    @media (max-width: 383px) {
+      .page-wrapper {
+        padding: 40px 16px;
+        gap: 16px;
+      }
+
+      /* Nav: 343px wide — active 130px out of 343px
+         flex-grow: 1.83 → 1.83/(1.83+3) * 343 = 129.97px */
+      .nav-pill { width: min(343px, 100%); }
+      .nav-pill a { font-size: 13px; padding: 10px 4px; }
+      .nav-pill a.active { flex-grow: 1.83; }
+      /* Swap to short labels on mobile only */
+      .nav-long { display: none; }
+      .nav-short { display: inline; }
+
+      /* Content containers: 343px matching Figma mobile */
+      .content-width, .sections-group { max-width: 343px; }
+
+      /* Hero text */
+      .hero-heading { font-size: 28px; letter-spacing: -1.12px; }
+      .hero-subtitle { font-size: 14px; }
+      .hero-body { font-size: 14px; }
+
+      /* Row-2col stays 2 col; gap inherits 8px from tablet */
+      .row-2col { grid-template-columns: 1fr 1fr; }
+
+      /* Bottom row: re-assert 1-col AFTER row-2col to fix cascade override */
+      .bottom-row { grid-template-columns: 1fr; gap: 8px; }
+
+      /* Quick link icon sizes per Figma spec */
+      .row-4col > :nth-child(1) img { width: 80px !important; height: 53.75px !important; max-width: unset !important; max-height: unset !important; object-fit: contain; }
+      .row-4col > :nth-child(1) p  { font-size: 11px; }
+      .row-4col > :nth-child(2) img { width: 80px !important; height: 80px !important; max-width: unset !important; max-height: unset !important; object-fit: contain; }
+      .row-4col > :nth-child(3) img { width: 72px !important; height: 54px !important; max-width: unset !important; max-height: unset !important; object-fit: contain; }
+      .row-4col > :nth-child(4) img { width: 89.5px !important; height: 89.5px !important; max-width: unset !important; max-height: unset !important; object-fit: contain; }
+
+      /* Hot takes: 76px height, hide expand arrows */
+      .hot-takes-card { height: 76px; min-height: unset; }
+      .expand-icon { display: none; }
+
+      /* Work cards inherit from tablet */
+      .work-placeholder-card { padding: 16px; }
+
+      /* AI card */
+      .ai-fed-card .ai-fed-heading { font-size: 20px; top: 16px; left: 16px; }
+      .ai-fed-card .martin-speech { display: none; }
+
+      /* Music + hyper: both full width within 343px bottom-row */
+      .music-card, .hyper-card { width: 100%; padding: 20px; }
+
+      /* Hyper card: fixed 311px height, polaroids scroll horizontally */
+      .hyper-card {
+        height: 311px;
+        min-height: unset;
+        overflow: hidden;
+        justify-content: flex-start;
+        gap: 12px;
+      }
+      .hyper-card .polaroid-scatter {
+        overflow-x: auto;
+        overflow-y: visible;
+        flex-wrap: nowrap;
+        width: 100%;
+        gap: 8px;
+        justify-content: flex-start;
+        padding-bottom: 8px; /* space for scrollbar */
+        -webkit-overflow-scrolling: touch;
+      }
+      .hyper-card .polaroid {
+        flex-shrink: 0;
+        width: 124px;
+        padding: 7px 7px 24px 7px;
+      }
+      .hyper-card .polaroid-photo { width: 110px; height: 120px; }
+      .hyper-card .polaroid-caption { width: 110px; }
+
+      .section-title-outfit { font-size: 22px; }
+      .section-subtitle-mono { font-size: 10px; letter-spacing: 0.8px; }
+
+      /* Mobile record stack: 268×225 container, 196px records */
+      .record-stack { width: 268px; height: 225px; }
+      .record { width: 196px; height: 196px; }
+      .record img.record-sheen     { width: 196px; height: 196px; }
+      .record img.record-iridescent { top: 61.09px; left: 61.09px; width: 71.88px; height: 71.88px; }
+      .record img.record-hub       { top: 68.17px; left: 68.17px; width: 57.5px;  height: 57.5px; }
+      .record img.record-hubring   { top: 77.42px; left: 77.42px; width: 39.19px; height: 39.19px; }
+      .record img.record-hole      { top: 84.62px; left: 84.62px; width: 24.83px; height: 24.83px; }
+      .record-1 { left: 0px;     top: 0px; }
+      .record-7 { left: 0px;     top: 0px; }
+      .record-2 { left: 13.66px; top: 4.74px; }
+      .record-3 { left: 27.31px; top: 9.47px; }
+      .record-4 { left: 40.97px; top: 14.21px; }
+      .record-5 { left: 54.62px; top: 18.95px; }
+      .record-6 { left: 68.28px; top: 23.68px; }
+
+      /* Bookshelf */
+      .bookshelf-row { gap: 4px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+
+    <!-- ========================================
+         1. NAV
+         ======================================== -->
+    <nav class="sticky-nav" aria-label="Main navigation">
+      <div class="nav-pill">
+        <a href="#about" class="active"><span class="nav-long">About Me</span><span class="nav-short">About</span></a>
+        <a href="#work">Work</a>
+        <a href="#hot-takes"><span class="nav-long">Hot Takes</span><span class="nav-short">Takes</span></a>
+        <a href="#just-fun">Just Fun</a>
+      </div>
+    </nav>
+
+    <!-- ========================================
+         2. HERO CARD
+         ======================================== -->
+    <section id="about" class="card hero-card content-width" aria-label="About me">
+      <div class="hero-photo">
+        <img src="assets/ellipse1.png" alt="Lexxiana Zollicoffer — profile photo" width="240" height="240" />
+      </div>
+      <div class="hero-text">
+        <h1 class="hero-heading">Hi, I'm Lexxiana!</h1>
+        <p class="hero-subtitle">Designer, writer, storyteller, and professional collector of interests</p>
+        <div class="hero-body">
+          <p>I spend my days building digital experiences for everyone and my free time chasing inspiration through travel, books, and the occasional existential rabbit hole.</p>
+          <p>I love fixating on the little details that make life interesting. And naturally, I bring a little bit of that curiosity into everything I create.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         3. QUICK LINKS ROW (4 cards)
+         ======================================== -->
+    <section class="row-4col content-width" aria-label="Quick links">
+
+      <!-- Homes.com — links to homes.com -->
+      <a href="https://www.homes.com/" target="_blank" rel="noopener" class="card quick-link-card">
+        <p>Currently designing for 83m monthly unique visitors at <strong>Homes.com</strong></p>
+        <img src="assets/image33.png" alt="Homes.com logo" />
+      </a>
+
+      <!-- LinkedIn -->
+      <a href="https://www.linkedin.com/in/lexxiana-zollicoffer-446645b2/" target="_blank" rel="noopener" class="card quick-link-card">
+        <img src="assets/image30.png" alt="LinkedIn" style="max-height:143px; max-width:143px;" />
+      </a>
+
+      <!-- Gmail — copies email to clipboard -->
+      <a href="mailto:lexxiana.z@gmail.com"
+         class="card quick-link-card gmail-copy"
+         style="position:relative;"
+         onclick="event.preventDefault();navigator.clipboard.writeText('lexxiana.z@gmail.com').then(()=>{this.setAttribute('data-copied','true');setTimeout(()=>this.removeAttribute('data-copied'),2000)});">
+        <img src="assets/image31.png" alt="Email / Gmail" style="max-height:96px; max-width:128px;" />
+      </a>
+
+      <!-- Resume — not yet linked -->
+      <article class="card quick-link-card">
+        <img src="assets/image32.png" alt="Resume document" style="max-height:135px; max-width:135px;" />
+      </article>
+
+    </section>
+
+    <!-- ========================================
+         4–6. WORK SECTION (three rows)
+         ======================================== -->
+    <div class="sections-group" id="work">
+
+      <!-- Work Row 1: Homes Membership + Agent Dash -->
+      <div class="row-2col">
+        <article class="card work-placeholder-card">
+          <p class="work-placeholder-title">Homes.com Mbrshp<br>Platinum Ads</p>
+          <p class="work-placeholder-label">placeholder*</p>
+        </article>
+        <article class="card work-placeholder-card">
+          <p class="work-placeholder-title">Agent Dash –<br>Clients Tab</p>
+          <p class="work-placeholder-label">placeholder*</p>
+        </article>
+      </div>
+
+      <!-- Work Row 2: Domain Integration + AI Meet the Fed -->
+      <div class="row-2col">
+        <article class="card work-placeholder-card">
+          <p class="work-placeholder-title">Domain Integration –<br>Agent Tooling</p>
+          <p class="work-placeholder-label">placeholder*</p>
+        </article>
+
+        <!-- AI Meet the Fed (NOT a placeholder) -->
+        <article class="card ai-fed-card">
+          <div class="ai-fed-heading">AI, <br>Meet the Fed</div>
+          <div class="martin-speech">Hello...<br>I'm Martin!</div>
+        </article>
+      </div>
+
+      <!-- Work Row 3: Wanderly + Ripple -->
+      <div class="row-2col">
+        <article class="card work-placeholder-card">
+          <p class="work-placeholder-title">Wanderly Case Study</p>
+          <p class="work-placeholder-label">placeholder*</p>
+        </article>
+        <article class="card work-placeholder-card">
+          <p class="work-placeholder-title">Ripple Case Study</p>
+          <p class="work-placeholder-label">placeholder*</p>
+        </article>
+      </div>
+
+    </div><!-- /work group -->
+
+    <!-- ========================================
+         7–8. HOT TAKES SECTION (both rows)
+         ======================================== -->
+    <div class="sections-group" id="hot-takes">
+
+      <!-- Hot Takes Row 1: AI + My Current Stack -->
+      <div class="row-2col">
+        <article class="card hot-takes-card">
+          <h2 class="hot-takes-title">AI</h2>
+          <p class="hot-takes-label">My Hot Takes</p>
+          <img class="expand-icon" src="assets/elements.svg" alt="Expand" />
+        </article>
+        <article class="card hot-takes-card">
+          <h2 class="hot-takes-title">My Current Stack</h2>
+          <p class="hot-takes-label">My Hot Takes</p>
+          <img class="expand-icon" src="assets/elements.svg" alt="Expand" />
+        </article>
+      </div>
+
+      <!-- Hot Takes Row 2: I Love Most About Design + Say Things -->
+      <div class="row-2col">
+        <article class="card hot-takes-card">
+          <h2 class="hot-takes-title">I Love Most About Design...</h2>
+          <p class="hot-takes-label">My Hot Takes</p>
+          <img class="expand-icon" src="assets/elements.svg" alt="Expand" />
+        </article>
+        <article class="card hot-takes-card">
+          <h2 class="hot-takes-title">Say Things</h2>
+          <p class="hot-takes-label">My Hot Takes</p>
+          <img class="expand-icon" src="assets/elements.svg" alt="Expand" />
+        </article>
+      </div>
+
+    </div><!-- /hot-takes group -->
+
+    <!-- ========================================
+         BOOKSHELF CARD
+         ======================================== -->
+    <section id="just-fun" class="card bookshelf-card content-width" aria-label="Bookshelf">
+      <div class="bookshelf-header">
+        <h2 class="bookshelf-title">A Peak at my Bookshelf</h2>
+        <p class="bookshelf-subtitle">seriously, this is just a peak</p>
+      </div>
+
+      <div class="bookshelf-outer">
+      <div class="bookshelf-row">
+
+        <!-- Book 1: Thinking Fast and Slow -->
+        <div class="book-spine" style="background:#2d4a7a; height:194px; width:53px;">
+          <div class="book-spine-top" style="background:#1a2f52; height:5px;"></div>
+          <div class="book-spine-body" style="flex:1;">
+            <span class="book-spine-title" style="color:#fff;">Thinking Fast and Slow</span>
+            <span class="book-spine-author" style="color:#fff;">Daniel<br>Kahneman</span>
+          </div>
+          <div class="book-spine-bottom" style="background:#1a2f52; height:4px;"></div>
+        </div>
+
+        <!-- Book 2: Beyond Good and Evil -->
+        <div class="book-spine" style="background:#6b7280; height:157px; width:48px;">
+          <div class="book-spine-top" style="background:#4b5563; height:4px;"></div>
+          <div class="book-spine-body" style="flex:1;">
+            <span class="book-spine-title" style="color:#f9fafb;">Beyond Good and Evil</span>
+            <span class="book-spine-author" style="color:#f9fafb;">Nietzsche</span>
+          </div>
+        </div>
+
+        <!-- Book 3: Babel -->
+        <div class="book-spine" style="background:#e8dcc8; height:188px; width:50px;">
+          <div class="book-spine-top" style="background:#c8b89a; height:5px;"></div>
+          <div class="book-spine-body" style="flex:1;">
+            <span class="book-spine-title" style="color:#4a3728;">BABEL</span>
+            <div style="height:1px; background:#4a3728; opacity:0.4; width:70%; margin:2px auto;"></div>
+            <span class="book-spine-author" style="color:#4a3728;">RF Kuang</span>
+          </div>
+          <div class="book-spine-bottom" style="background:#c8b89a; height:4px;"></div>
+        </div>
+
+        <!-- Book 4: Dark Matter -->
+        <div class="book-spine" style="background:#3a3a3a; height:169px; width:33px;">
+          <div class="book-spine-top" style="background:#222; height:4px;"></div>
+          <div class="book-spine-body" style="flex:1;">
+            <span class="book-spine-title" style="color:#fff;">Dark Matter</span>
+            <span class="book-spine-author" style="color:#fff;">Blake<br>Crouch</span>
+          </div>
+        </div>
+
+        <!-- Book 5: Inferno -->
+        <div class="book-spine" style="background:#852221; height:182px; width:46px;">
+          <div class="book-spine-top" style="background:#a75c4b; height:5px;"></div>
+          <div class="book-spine-body" style="flex:1;">
+            <span class="book-spine-title" style="color:#fff0f3;">INFERNO</span>
+            <span class="book-spine-author" style="color:#fff;">Dante<br>Alighieri</span>
+          </div>
+          <div class="book-spine-bottom" style="background:#a75c4b; height:4px;"></div>
+        </div>
+
+        <!-- Book 6: Whistling Vivaldi -->
+        <div class="book-spine" style="background:#bcd0d4; height:196px; width:63px;">
+          <div class="book-spine-top" style="background:#80898b; height:6px;"></div>
+          <div class="book-spine-body" style="flex:1;">
+            <div style="text-align:center;">
+              <span class="book-spine-title" style="color:#1a0f00; font-size:9px;">WHISTLING VIVALDI</span>
+              <div style="font-family:'Inter',sans-serif; font-weight:300; font-size:6px; color:#1a0f00; text-transform:uppercase;">How<br>stereotypes<br>affect us</div>
+            </div>
+            <div style="height:1px; background:#1a0f00; opacity:0.5; width:70%; margin:2px auto;"></div>
+            <span class="book-spine-author" style="color:#1a0f00;">Claude M Steele</span>
+          </div>
+          <div class="book-spine-bottom" style="background:#80898b; height:5px;"></div>
+        </div>
+
+        <!-- Book 7: The Fifth Season -->
+        <div class="book-spine" style="background:#3a7a7a; height:163px; width:36px;">
+          <div class="book-spine-top" style="background:#255c5c; height:4px;"></div>
+          <div class="book-spine-body" style="flex:1;">
+            <span class="book-spine-title" style="color:#e0ffff;">The Fifth Season</span>
+            <span class="book-spine-author" style="color:#fff;">N.K.<br>Jemisin</span>
+          </div>
+        </div>
+
+        <!-- Book 8: Design of Everyday Things -->
+        <div class="book-spine" style="background:rgba(255,206,33,0.95); height:179px; width:52px;">
+          <div class="book-spine-top" style="background:#b83434; height:5px;"></div>
+          <div class="book-spine-body" style="flex:1;">
+            <span class="book-spine-title" style="color:#1e1e1e;">DESIGN OF EVERYDAY THINGS</span>
+            <span class="book-spine-author" style="color:#000;">Don Norman</span>
+          </div>
+          <div class="book-spine-bottom" style="background:#b83434; height:4px;"></div>
+        </div>
+
+        <!-- Book 9: Continuous Discovery Habits -->
+        <div class="book-spine" style="background:#4a3f8c; height:188px; width:61px;">
+          <div class="book-spine-top" style="background:#2e2660; height:5px;"></div>
+          <div class="book-spine-body" style="flex:1;">
+            <span class="book-spine-title" style="color:#e8e4ff;">CONTINUOUS DISCOVERY HABITS</span>
+            <div style="height:1px; background:#e8e4ff; opacity:0.5; width:60%; margin:2px auto;"></div>
+            <span class="book-spine-author" style="color:#fff;">Teresa Torres</span>
+          </div>
+          <div class="book-spine-bottom" style="background:#2e2660; height:4px;"></div>
+        </div>
+
+        <!-- Book 10: White Nights -->
+        <div class="book-spine" style="background:#cfcfcf; height:172px; width:46px;">
+          <div class="book-spine-top" style="background:#8a8a8a; height:5px;"></div>
+          <div class="book-spine-body" style="flex:1;">
+            <span class="book-spine-title" style="color:#000;">WHITE NIGHTS</span>
+            <span class="book-spine-author" style="color:#000;">Fyodor<br>Dostoevsky</span>
+          </div>
+          <div class="book-spine-bottom" style="background:#8a8a8a; height:4px;"></div>
+        </div>
+
+        <!-- Book 11: Addie Larue -->
+        <div class="book-spine" style="background:#e8d7c4; height:182px; width:41px;">
+          <div class="book-spine-top" style="background:#a67c52; height:5px;"></div>
+          <div class="book-spine-body" style="flex:1;">
+            <span class="book-spine-title" style="color:#5a3a1e;">ADDIE LARUE</span>
+            <span class="book-spine-author" style="color:#8a5a3a;">VE Schwab</span>
+          </div>
+          <div class="book-spine-bottom" style="background:#a67c52; height:4px;"></div>
+        </div>
+
+        <!-- Book 12: Mismatch -->
+        <div class="book-spine" style="background:#d5cefa; height:188px; width:57px;">
+          <div class="book-spine-top" style="background:#2e2660; height:5px;"></div>
+          <div class="book-spine-body" style="flex:1;">
+            <span class="book-spine-title" style="color:#000;">MISMATCH: HOW INCLUSION SHAPES DESIGN</span>
+            <span class="book-spine-author" style="color:#000;">Kat Holmes</span>
+          </div>
+          <div class="book-spine-bottom" style="background:#2e2660; height:4px;"></div>
+        </div>
+
+        <!-- Book 13: Lightbringer -->
+        <div class="book-spine" style="background:#333; height:157px; width:51px;">
+          <div class="book-spine-top" style="background:rgba(111,104,88,0.95); height:5px;"></div>
+          <div class="book-spine-body" style="flex:1;">
+            <span class="book-spine-title" style="color:#fff8f6;">LIGHT BRINGER</span>
+            <span class="book-spine-author" style="color:#fff;">Peirce Brown</span>
+          </div>
+          <div class="book-spine-bottom" style="background:rgba(111,104,88,0.95); height:4px;"></div>
+        </div>
+
+      </div><!-- /bookshelf-row -->
+        <!-- Shelf sits outside the scroll container so it always spans full width -->
+        <div class="bookshelf-wood">
+          <div class="shelf-top-band"></div>
+          <div class="shelf-main-band"></div>
+          <div class="shelf-shadow-band"></div>
+        </div>
+      </div><!-- /bookshelf-outer -->
+    </section>
+
+    <!-- ========================================
+         BOTTOM ROW: Music + Hyperfixation
+         ======================================== -->
+    <section class="row-2col content-width bottom-row" aria-label="Just fun">
+
+      <!-- Music / Current Rotation Card -->
+      <article class="card music-card">
+        <div class="music-card-header">
+          <h2 class="section-title-outfit">My current rotation</h2>
+          <p class="section-subtitle-mono">a little stack of favorites...it's random, I know</p>
+        </div>
+
+        <!-- Stacked vinyl records — DOM order = z-order (first=back, last=front) -->
+        <div class="record-stack">
+          <!-- Record 1 — back, left=0 top=0 -->
+          <div class="record record-1">
+            <img class="record-label" src="assets/stacked_record1.png" alt="Vinyl record" />
+            <img class="record-sheen" src="assets/sheen.png" alt="" />
+            <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
+            <img class="record-hub" src="assets/hub.svg" alt="" />
+            <img class="record-hubring" src="assets/hubring.svg" alt="" />
+            <img class="record-hole" src="assets/hole.svg" alt="" />
+          </div>
+          <!-- Record 7 — 2nd from back, same position as record 1, reflection overlay -->
+          <div class="record record-7">
+            <img class="record-label" src="assets/stacked_record7.png" alt="Vinyl record" />
+            <img class="record-sheen" src="assets/sheen.png" alt="" />
+            <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
+            <img class="record-hub" src="assets/hub.svg" alt="" />
+            <img class="record-hubring" src="assets/hubring.svg" alt="" />
+            <img class="record-hole" src="assets/hole.svg" alt="" />
+            <img class="record-reflection" src="assets/reflection_fixed.png" alt="" />
+          </div>
+          <!-- Record 2 — left=17.3px top=6px -->
+          <div class="record record-2">
+            <img class="record-label" src="assets/stacked_record2.png" alt="Vinyl record" />
+            <img class="record-sheen" src="assets/sheen.png" alt="" />
+            <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
+            <img class="record-hub" src="assets/hub.svg" alt="" />
+            <img class="record-hubring" src="assets/hubring.svg" alt="" />
+            <img class="record-hole" src="assets/hole.svg" alt="" />
+          </div>
+          <!-- Record 3 — left=34.6px top=12px -->
+          <div class="record record-3">
+            <img class="record-label" src="assets/stacked_record3.png" alt="Vinyl record" />
+            <img class="record-sheen" src="assets/sheen.png" alt="" />
+            <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
+            <img class="record-hub" src="assets/hub.svg" alt="" />
+            <img class="record-hubring" src="assets/hubring.svg" alt="" />
+            <img class="record-hole" src="assets/hole.svg" alt="" />
+          </div>
+          <!-- Record 4 — left=51.9px top=18px -->
+          <div class="record record-4">
+            <img class="record-label" src="assets/stacked_record4.png" alt="Vinyl record" />
+            <img class="record-sheen" src="assets/sheen.png" alt="" />
+            <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
+            <img class="record-hub" src="assets/hub.svg" alt="" />
+            <img class="record-hubring" src="assets/hubring.svg" alt="" />
+            <img class="record-hole" src="assets/hole.svg" alt="" />
+          </div>
+          <!-- Record 5 — left=69.2px top=24px -->
+          <div class="record record-5">
+            <img class="record-label" src="assets/stacked_record5.png" alt="Vinyl record" />
+            <img class="record-sheen" src="assets/sheen.png" alt="" />
+            <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
+            <img class="record-hub" src="assets/hub.svg" alt="" />
+            <img class="record-hubring" src="assets/hubring.svg" alt="" />
+            <img class="record-hole" src="assets/hole.svg" alt="" />
+          </div>
+          <!-- Record 6 — FRONT, left=86.5px top=30px -->
+          <div class="record record-6">
+            <img class="record-label" src="assets/stacked_record6.png" alt="Vinyl record" />
+            <img class="record-sheen" src="assets/sheen.png" alt="" />
+            <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
+            <img class="record-hub" src="assets/hub.svg" alt="" />
+            <img class="record-hubring" src="assets/hubring.svg" alt="" />
+            <img class="record-hole" src="assets/hole.svg" alt="" />
+          </div>
+        </div>
+
+        <!-- Track info -->
+        <div class="music-track-info">
+          <p class="track-title">Nothing's Gonna Hurt You Baby</p>
+          <p class="track-artist">Cigarettes After Sex &middot; 1 &middot; 2012</p>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="progress-bar-wrap" style="max-width:280px; width:100%;">
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill"></div>
+          </div>
+          <div class="progress-times">
+            <span>0:14</span>
+            <span>3:51</span>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="music-controls">
+          <img src="assets/previous.svg" alt="Previous track" />
+          <img src="assets/play_button.svg" alt="Play / Pause" class="play-btn" />
+          <img src="assets/next.svg" alt="Next track" />
+        </div>
+      </article>
+
+      <!-- Hyperfixation Card -->
+      <article class="card hyper-card">
+        <div class="hyper-card-header">
+          <h2 class="section-title-outfit">Most recent hyperfixation</h2>
+          <p class="section-subtitle-mono" style="letter-spacing:0.5px; font-size:14px; text-align:center;">Unique Jewelry Hunting</p>
+        </div>
+
+        <!-- Polaroid frames (placeholder, to be filled with real photos) -->
+        <div class="polaroid-scatter">
+          <div class="polaroid polaroid-a">
+            <div class="polaroid-photo"></div>
+            <p class="polaroid-caption">alt caption here</p>
+          </div>
+          <div class="polaroid polaroid-b">
+            <div class="polaroid-photo"></div>
+            <p class="polaroid-caption">alt caption here</p>
+          </div>
+          <div class="polaroid polaroid-c">
+            <div class="polaroid-photo"></div>
+            <p class="polaroid-caption">alt caption here</p>
+          </div>
+          <div class="polaroid polaroid-d">
+            <div class="polaroid-photo"></div>
+            <p class="polaroid-caption">alt caption here</p>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+  </div><!-- /page-wrapper -->
+
+  <script>
+    (function () {
+      const pill    = document.querySelector('.nav-pill');
+      const links   = Array.from(document.querySelectorAll('.nav-pill a'));
+      const sections = ['about','work','hot-takes','just-fun']
+                         .map(function (id) { return document.getElementById(id); })
+                         .filter(Boolean);
+
+      /* ── Set active link ── */
+      function setActive(link) {
+        links.forEach(function (l) {
+          l.classList.remove('active');
+          l.removeAttribute('aria-current');
+        });
+        link.classList.add('active');
+        link.setAttribute('aria-current', 'page');
+      }
+
+      /* ── Init ── */
+      var initial = pill.querySelector('a.active') || links[0];
+      setActive(initial);
+
+      /* ── Click ── */
+      links.forEach(function (link) {
+        link.addEventListener('click', function () {
+          setActive(this);
+        });
+      });
+
+      /* ── Scroll tracking ── */
+      var scrollLock = false;
+      const observer = new IntersectionObserver(function (entries) {
+        if (scrollLock) return;
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            var link = pill.querySelector('a[href="#' + entry.target.id + '"]');
+            if (link) setActive(link);
+          }
+        });
+      }, { rootMargin: '-10% 0px -80% 0px', threshold: 0 });
+
+      sections.forEach(function (s) { observer.observe(s); });
+
+      links.forEach(function (link) {
+        link.addEventListener('click', function () {
+          scrollLock = true;
+          setTimeout(function () { scrollLock = false; }, 800);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
