@@ -40,6 +40,7 @@
       font-weight: 400;
       line-height: 1.55;
       min-height: 100vh;
+      min-height: 100dvh; /* mobile Safari: excludes hidden address bar */
     }
     img { display: block; max-width: 100%; }
 
@@ -864,12 +865,14 @@
       .polaroid-scatter {
         position: static;
         min-height: unset;
-        width: auto;
+        width: 100%;
         display: flex;
         flex-direction: row;
         gap: 10px;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: flex-start;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
       }
       .polaroid { position: static; }
       .polaroid-a, .polaroid-b, .polaroid-c, .polaroid-d {
@@ -884,7 +887,7 @@
     /* =============================================
        MOBILE BREAKPOINT  (≤383px — Figma mobile frame width)
        ============================================= */
-    @media (max-width: 383px) {
+    @media (max-width: 430px) {
       .page-wrapper {
         padding: 40px 16px;
         gap: 16px;
