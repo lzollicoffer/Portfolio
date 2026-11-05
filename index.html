@@ -2272,6 +2272,82 @@
                .getPropertyValue('--breakpoint').trim().replace(/['"]/g, '');
     }
 
+    /* ── Category label resolution ───────────────────────────────
+       book.category may be "TERM A · TERM B" (terms joined by ' · ').
+       We show the full label if it fits, or fall back to just the first
+       term. The separator must be exactly ' · ' (space · space).
+       To add or change categories, edit book.category in the data block
+       above — no other code needs to change.
+       Measurement uses a hidden off-screen probe styled to match
+       .bd-category exactly (same font, size, letter-spacing, transform)
+       so the decision is based on real rendered text width, not estimates.
+       We measure once up front, then again after fonts.ready in case
+       IBM Plex Mono hadn't finished loading on the first pass.
+       On resize we only re-measure when the CSS breakpoint actually
+       changes (e.g. phone rotation), not on every pixel nudge.
+    ──────────────────────────────────────────────────────────────── */
+    var resolvedCategories = new Array(books.length).fill(null);
+    var lastMeasuredBp     = null;
+
+    function measureCategories() {
+      var cardW   = parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue('--book-open-width')
+      ) || 340;
+      var padding = 16; /* 8px left + 8px right from .book-slot.is-open .book-detail */
+
+      /* Off-screen probe: styles must match .bd-category exactly */
+      var probe = document.createElement('span');
+      probe.style.cssText =
+        'position:absolute;top:-9999px;left:-9999px;visibility:hidden;pointer-events:none;' +
+        'white-space:nowrap;font-family:"IBM Plex Mono",monospace;' +
+        'font-weight:400;font-size:10px;letter-spacing:0.8px;text-transform:uppercase;';
+      document.body.appendChild(probe);
+
+      books.forEach(function (book, i) {
+        var btn    = shelfSlots[i].querySelector('button.book-spine');
+        var spineW = btn.offsetWidth;
+        var availW = cardW - spineW - padding;
+        var parts  = book.category.split(' \u00b7 '); /* split on ' · ' */
+        var full   = book.category;
+        var first  = parts[0];
+
+        probe.textContent = full;
+        var fullW = probe.getBoundingClientRect().width;
+
+        /* Full label fits → show all. Otherwise show just the first term
+           (CSS ellipsis on .bd-category handles any remaining overflow). */
+        resolvedCategories[i] = (fullW <= availW) ? full : first;
+      });
+
+      document.body.removeChild(probe);
+      lastMeasuredBp = getBreakpoint();
+    }
+
+    /* Measure immediately so cards opened before fonts load still have a value */
+    measureCategories();
+
+    /* Re-measure once IBM Plex Mono is confirmed loaded for accurate metrics */
+    document.fonts.ready.then(function () {
+      measureCategories();
+      /* Correct any card that was opened during the gap before fonts loaded */
+      if (openIdx !== null) {
+        shelfSlots[openIdx].querySelector('.bd-category').textContent =
+          resolvedCategories[openIdx];
+      }
+    });
+
+    /* Re-measure on resize only when the breakpoint actually changes */
+    window.addEventListener('resize', function () {
+      var bp = getBreakpoint();
+      if (bp !== lastMeasuredBp) {
+        measureCategories();
+        if (openIdx !== null) {
+          shelfSlots[openIdx].querySelector('.bd-category').textContent =
+            resolvedCategories[openIdx];
+        }
+      }
+    });
+
     /* ── Scroll helpers ───────────────────────────────────────── */
     function cancelPendingScroll() {
       if (scrollState.detail && scrollState.handler) {
@@ -2417,7 +2493,8 @@
       /* Populate content */
       detail.querySelector('.bd-title').textContent    = book.title;
       detail.querySelector('.bd-author').textContent   = book.author;
-      detail.querySelector('.bd-category').textContent = book.category;
+      detail.querySelector('.bd-category').textContent =
+        resolvedCategories[idx] !== null ? resolvedCategories[idx] : book.category;
       detail.querySelector('.bd-desc').textContent     = book.desc;
 
       /* Pin slot height exactly to this spine's inline height.
