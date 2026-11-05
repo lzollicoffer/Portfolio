@@ -1340,7 +1340,7 @@
           <!-- Record 1 — back, left=0 top=0 -->
           <div class="record record-1" data-idx="0">
             <div class="record-platter">
-              <img class="record-label" src="assets/stacked_record1.png" alt="Vinyl record" />
+              <img class="record-label" src="assets/disk%207.png" alt="Vinyl record" />
               <img class="record-sheen" src="assets/sheen.png" alt="" />
               <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
               <img class="record-hub" src="assets/hub.svg" alt="" />
@@ -1351,7 +1351,7 @@
           <!-- Record 7 — 2nd from back, same position as record 1, reflection overlay -->
           <div class="record record-7" data-idx="1">
             <div class="record-platter">
-              <img class="record-label" src="assets/stacked_record7.png" alt="Vinyl record" />
+              <img class="record-label" src="assets/disk%206.png" alt="Vinyl record" />
               <img class="record-sheen" src="assets/sheen.png" alt="" />
               <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
               <img class="record-hub" src="assets/hub.svg" alt="" />
@@ -1363,7 +1363,7 @@
           <!-- Record 2 — left=17.3px top=6px -->
           <div class="record record-2" data-idx="2">
             <div class="record-platter">
-              <img class="record-label" src="assets/stacked_record2.png" alt="Vinyl record" />
+              <img class="record-label" src="assets/disk%205.png" alt="Vinyl record" />
               <img class="record-sheen" src="assets/sheen.png" alt="" />
               <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
               <img class="record-hub" src="assets/hub.svg" alt="" />
@@ -1374,7 +1374,7 @@
           <!-- Record 3 — left=34.6px top=12px -->
           <div class="record record-3" data-idx="3">
             <div class="record-platter">
-              <img class="record-label" src="assets/stacked_record3.png" alt="Vinyl record" />
+              <img class="record-label" src="assets/disk%204.png" alt="Vinyl record" />
               <img class="record-sheen" src="assets/sheen.png" alt="" />
               <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
               <img class="record-hub" src="assets/hub.svg" alt="" />
@@ -1385,7 +1385,7 @@
           <!-- Record 4 — left=51.9px top=18px -->
           <div class="record record-4" data-idx="4">
             <div class="record-platter">
-              <img class="record-label" src="assets/stacked_record4.png" alt="Vinyl record" />
+              <img class="record-label" src="assets/disk%203.png" alt="Vinyl record" />
               <img class="record-sheen" src="assets/sheen.png" alt="" />
               <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
               <img class="record-hub" src="assets/hub.svg" alt="" />
@@ -1396,7 +1396,7 @@
           <!-- Record 5 — left=69.2px top=24px -->
           <div class="record record-5" data-idx="5">
             <div class="record-platter">
-              <img class="record-label" src="assets/stacked_record5.png" alt="Vinyl record" />
+              <img class="record-label" src="assets/disk%202.png" alt="Vinyl record" />
               <img class="record-sheen" src="assets/sheen.png" alt="" />
               <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
               <img class="record-hub" src="assets/hub.svg" alt="" />
@@ -1407,7 +1407,7 @@
           <!-- Record 6 — FRONT, left=86.5px top=30px -->
           <div class="record record-6" data-idx="6">
             <div class="record-platter">
-              <img class="record-label" src="assets/stacked_record6.png" alt="Vinyl record" />
+              <img class="record-label" src="assets/disc%201.png" alt="Vinyl record" />
               <img class="record-sheen" src="assets/sheen.png" alt="" />
               <img class="record-iridescent" src="assets/iridescent_ring.png" alt="" />
               <img class="record-hub" src="assets/hub.svg" alt="" />
@@ -1440,6 +1440,9 @@
           <img src="assets/play_button.svg" alt="Play / Pause" class="play-btn" />
           <img src="assets/next.svg" alt="Next track" />
         </div>
+        <!-- Spotify embed — must be visible per Spotify ToS; also works as standalone player.
+             Non-logged-in visitors get 30-second previews; logged-in users get full tracks. -->
+        <div id="spotify-embed" style="width:100%; margin-top:12px; border-radius:12px; overflow:hidden; min-height:152px;"></div>
       </article>
 
       <!-- Hyperfixation Card -->
@@ -1525,30 +1528,31 @@
       });
     })();
   </script>
+  <!-- Spotify iFrame API — loads async; onSpotifyIframeApiReady fires when ready -->
+  <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
+
   <script>
   (function () {
-    /* ── Song data ──────────────────────────────────────────
-       7 placeholder entries — one per record image.
-       Images are ordered so the initial front (slot 6) shows
-       stacked_record6.png, slot 5 shows stacked_record5.png, etc.
-       Replace title/artist/year/duration with real data later.
-    ─────────────────────────────────────────────────────── */
+    /* ── Song data ─────────────────────────────────────────
+       Disc 1 = front record (initially playing).
+       Images use URL-encoded filenames matching assets folder.
+       Durations are fallback values used when Spotify is unavailable.
+    ───────────────────────────────────────────────────────── */
     var songs = [
-      { title: "Nothing's Gonna Hurt You Baby", artist: 'Cigarettes After Sex', year: '2012', duration: 231, img: 'stacked_record6.png' },
-      { title: 'Placeholder Song 2',            artist: 'Artist Two',           year: '2020', duration: 198, img: 'stacked_record5.png' },
-      { title: 'Placeholder Song 3',            artist: 'Artist Three',         year: '2018', duration: 243, img: 'stacked_record4.png' },
-      { title: 'Placeholder Song 4',            artist: 'Artist Four',          year: '2021', duration: 215, img: 'stacked_record3.png' },
-      { title: 'Placeholder Song 5',            artist: 'Artist Five',          year: '2019', duration: 187, img: 'stacked_record2.png' },
-      { title: 'Placeholder Song 6',            artist: 'Artist Six',           year: '2017', duration: 222, img: 'stacked_record1.png' },
-      { title: 'Placeholder Song 7',            artist: 'Artist Seven',         year: '2022', duration: 204, img: 'stacked_record7.png' },
+      { title: "Nothing's Gonna Hurt You Baby", artist: 'Cigarettes After Sex', year: '2012', duration: 286, uri: 'spotify:track:3W7KHojYGgYaoX9ogKO9hU', img: 'disc%201.png' },
+      { title: 'Molasses',                       artist: 'Kwaku Asante',         year: '2019', duration: 267, uri: 'spotify:track:6xVFfJxvDmuYqpnutxBECP', img: 'disk%202.png' },
+      { title: 'Lately',                         artist: 'Jorja Smith',          year: '2023', duration: 127, uri: 'spotify:track:2DEUiGcDxB4QpImgydZmTi', img: 'disk%203.png' },
+      { title: 'Mad At Fire',                    artist: 'Elmiene',              year: '2023', duration: 231, uri: 'spotify:track:3PqLsRd5qvGGYllBy1IWII', img: 'disk%204.png' },
+      { title: 'Pretend',                        artist: 'Jorja Smith',          year: '2026', duration: 163, uri: 'spotify:track:5W2jUN0gWrwy74w38Vi6wa', img: 'disk%205.png' },
+      { title: 'Alesis',                         artist: 'Mk.gee',              year: '2024', duration: 198, uri: 'spotify:track:1fAaC0BVOACO5hmyiwIqAG', img: 'disk%206.png' },
+      { title: "Can't Stop",                     artist: 'Red Hot Chili Peppers',year: '2002', duration: 269, uri: 'spotify:track:3ZOEytgrvLwQaqXreDs2Jx', img: 'disk%207.png' },
     ];
 
-    /* ── Position tables ────────────────────────────────────
+    /* ── Position tables ───────────────────────────────────
        Tablet (≤776px) has no record-position overrides in CSS,
        so it reuses desktop values. Mobile (≤430px) has its own.
-       JS reads --breakpoint custom property set by CSS media
-       queries — no pixel values hardcoded here.
-    ─────────────────────────────────────────────────────── */
+       JS reads --breakpoint set by CSS — no px values hardcoded.
+    ───────────────────────────────────────────────────────── */
     var POS = {
       desktop: [
         { left: 0,     top: 0,  z: 1 },
@@ -1569,8 +1573,6 @@
         { left: 68.28,  top: 23.68, z: 7 },
       ],
     };
-    /* Tablet reuses desktop positions — confirmed: CSS has no
-       record-position overrides in the 776px breakpoint block. */
     POS.tablet = POS.desktop;
 
     function getPos() {
@@ -1579,47 +1581,41 @@
       return POS[bp] || POS.desktop;
     }
 
-    /* ── DOM refs ────────────────────────────────────────── */
-    var stackEl      = document.querySelector('.record-stack');
-    /* Collect in DOM order: data-idx 0-6 */
-    var recordEls    = Array.from(stackEl.querySelectorAll('.record'))
-                        .sort(function (a, b) {
-                          return +a.dataset.idx - +b.dataset.idx;
-                        });
-    var titleEl      = document.querySelector('.track-title');
-    var artistEl     = document.querySelector('.track-artist');
-    var fillEl       = document.querySelector('.progress-bar-fill');
-    var timeLeftEl   = document.querySelector('.progress-times span:first-child');
-    var timeRightEl  = document.querySelector('.progress-times span:last-child');
-    var playBtn      = document.querySelector('.play-btn');
-    var prevBtn      = document.querySelector('.music-controls img:first-child');
-    var nextBtn      = document.querySelector('.music-controls img:last-child');
+    /* ── DOM refs ──────────────────────────────────────────── */
+    var stackEl     = document.querySelector('.record-stack');
+    var recordEls   = Array.from(stackEl.querySelectorAll('.record'))
+                       .sort(function (a, b) { return +a.dataset.idx - +b.dataset.idx; });
+    var titleEl     = document.querySelector('.track-title');
+    var artistEl    = document.querySelector('.track-artist');
+    var fillEl      = document.querySelector('.progress-bar-fill');
+    var timeLeftEl  = document.querySelector('.progress-times span:first-child');
+    var timeRightEl = document.querySelector('.progress-times span:last-child');
+    var playBtn     = document.querySelector('.play-btn');
+    var prevBtn     = document.querySelector('.music-controls img:first-child');
+    var nextBtn     = document.querySelector('.music-controls img:last-child');
 
-    /* ── State ───────────────────────────────────────────── */
-    /* slots[i] = slot number (0=back … 6=front) for recordEls[i].
-       Initial DOM order already matches slot order 0-6.         */
+    /* ── State ─────────────────────────────────────────────── */
     var slots      = [0, 1, 2, 3, 4, 5, 6];
-    /* slotSong[slot] = index into songs[].
-       Slot 6 (front) starts with song 0 (stacked_record6.png).  */
-    var slotSong   = [6, 5, 4, 3, 2, 1, 0];
+    var slotSong   = [6, 5, 4, 3, 2, 1, 0]; /* slotSong[slot] = songs[] index */
     var isPlaying  = false;
     var isBusy     = false;
     var progSec    = 0;
     var timerId    = null;
 
-    /* ── Helpers ─────────────────────────────────────────── */
-    function frontEl() {
-      return recordEls[slots.indexOf(6)];
-    }
-    function currentSong() {
-      return songs[slotSong[6]];
-    }
+    /* Spotify state */
+    var spotifyCtrl  = null;
+    var spotifyReady = false;
+    var spotifyFailed = false;
+
+    /* ── Helpers ───────────────────────────────────────────── */
+    function frontEl()     { return recordEls[slots.indexOf(6)]; }
+    function currentSong() { return songs[slotSong[6]]; }
     function fmt(s) {
-      s = Math.floor(s);
+      s = Math.max(0, Math.floor(s));
       return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2);
     }
 
-    /* ── Position application ─────────────────────────────── */
+    /* ── Position application ──────────────────────────────── */
     function applyPos(animateIndices) {
       var pos = getPos();
       recordEls.forEach(function (el, i) {
@@ -1632,7 +1628,6 @@
       });
     }
 
-    /* Snap one record to a slot with no transition */
     function snapToSlot(el, slot) {
       var idx = recordEls.indexOf(el);
       el.classList.remove('is-shifting', 'is-exiting');
@@ -1643,16 +1638,14 @@
       el.style.zIndex = p.z;
     }
 
-    /* ── Initial render ───────────────────────────────────── */
-    applyPos([]);
+    applyPos([]); /* initial render */
 
-    /* ── Spin ─────────────────────────────────────────────── */
-    function platterOf(el) {
-      return el.querySelector('.record-platter');
-    }
+    /* ── Spin ──────────────────────────────────────────────── */
+    function platterOf(el) { return el.querySelector('.record-platter'); }
     function spinOn() {
-      platterOf(frontEl()).classList.add('spinning');
-      platterOf(frontEl()).classList.remove('paused');
+      var p = platterOf(frontEl());
+      p.classList.add('spinning');
+      p.classList.remove('paused');
     }
     function spinPause() {
       platterOf(frontEl()).classList.add('paused');
@@ -1663,19 +1656,21 @@
       });
     }
 
-    /* ── Progress ─────────────────────────────────────────── */
-    function updateBar() {
-      var song = currentSong();
-      var pct  = Math.min(progSec / song.duration, 1);
+    /* ── Progress bar ──────────────────────────────────────── */
+    function updateBar(durSec) {
+      var dur = (durSec != null && durSec > 0) ? durSec : currentSong().duration;
+      var pct = dur > 0 ? Math.min(progSec / dur, 1) : 0;
       fillEl.style.width      = (pct * 100) + '%';
       timeLeftEl.textContent  = fmt(progSec);
-      timeRightEl.textContent = fmt(song.duration);
+      timeRightEl.textContent = fmt(dur);
     }
+
+    /* Fallback timer — only used when Spotify is unavailable */
     function resetProg() {
       clearInterval(timerId); timerId = null;
       progSec = 0; updateBar();
     }
-    function startTimer() {
+    function startFallbackTimer() {
       clearInterval(timerId);
       timerId = setInterval(function () {
         progSec++;
@@ -1684,17 +1679,59 @@
       }, 1000);
     }
 
-    /* ── Track info ───────────────────────────────────────── */
+    /* ── Track info ────────────────────────────────────────── */
     function updateUI() {
       var s = currentSong();
       titleEl.textContent  = s.title;
       artistEl.textContent = s.artist + ' \u00b7 ' + s.year;
       resetProg();
-      if (isPlaying) startTimer();
+      /* Only run simulated timer when Spotify isn't available */
+      if (isPlaying && spotifyFailed) startFallbackTimer();
       updateBar();
     }
 
-    /* ── Swap animation ───────────────────────────────────── */
+    /* ── Spotify iFrame API ────────────────────────────────── */
+    window.onSpotifyIframeApiReady = function (IFrameAPI) {
+      spotifyReady = true;
+      var el = document.getElementById('spotify-embed');
+      if (!el) return;
+      IFrameAPI.createController(
+        el,
+        { uri: songs[slotSong[6]].uri, width: '100%', height: 152 },
+        function (ctrl) {
+          spotifyCtrl = ctrl;
+
+          ctrl.addListener('playback_update', function (e) {
+            var d = e.data;
+            /* Skip UI spin changes mid-swap to avoid fighting the animation */
+            if (!isBusy) {
+              var nowPlaying = !d.isPaused;
+              if (nowPlaying !== isPlaying) {
+                isPlaying = nowPlaying;
+                playBtn.style.opacity = isPlaying ? '1' : '0.6';
+                playBtn.setAttribute('aria-label', isPlaying ? 'Pause' : 'Play');
+              }
+              if (isPlaying) { spinOn(); }
+              else           { spinPause(); }
+            }
+            /* Always update progress from real Spotify position */
+            progSec = (d.position || 0) / 1000;
+            updateBar((d.duration || 0) / 1000);
+          });
+        }
+      );
+    };
+
+    /* 5-second fallback: if Spotify script never fires, switch to simulation */
+    setTimeout(function () {
+      if (!spotifyReady) {
+        spotifyFailed = true;
+        /* If user already hit play before Spotify loaded, start the timer now */
+        if (isPlaying) startFallbackTimer();
+      }
+    }, 5000);
+
+    /* ── Swap animation ────────────────────────────────────── */
     var SWAP_MS = 450;
 
     function go(dir) {
@@ -1704,13 +1741,11 @@
       var fIdx = slots.indexOf(6);
       var fEl  = recordEls[fIdx];
 
-      /* For prev: pre-load the target song into slot 5 so it
-         becomes the new front after the rotation below.        */
+      /* Prev: pre-load the target song into slot 5 so it becomes
+         the new front after the rotation. It's nearly hidden there. */
       if (dir < 0) {
         var prevSongIdx = (slotSong[6] - 1 + songs.length) % songs.length;
-        /* Find which record is at slot 5 and update its image now
-           (it's nearly hidden, so the swap is invisible)        */
-        var slot5Idx = slots.indexOf(5);
+        var slot5Idx    = slots.indexOf(5);
         recordEls[slot5Idx].querySelector('.record-label').src =
           'assets/' + songs[prevSongIdx].img;
         slotSong[5] = prevSongIdx;
@@ -1728,95 +1763,120 @@
       });
       applyPos(shifting);
 
-      /* 3. Rotate slotSong: front song goes to back */
+      /* 3. Rotate slotSong array */
       var exitSong = slotSong[6];
       for (var s = 6; s > 0; s--) slotSong[s] = slotSong[s - 1];
       slotSong[0] = exitSong;
 
-      /* 4. After animation: settle exiting record to back */
+      /* 4. Settle after animation */
       setTimeout(function () {
         recordEls.forEach(function (el) { el.classList.remove('is-shifting'); });
         snapToSlot(fEl, 0);
 
-        /* Update new front record's label image */
+        /* Update new front label image */
         var newFrontEl = recordEls[slots.indexOf(6)];
         newFrontEl.querySelector('.record-label').src =
           'assets/' + songs[slotSong[6]].img;
 
-        /* Update spin to new front */
+        /* Tell Spotify to load the new track */
+        if (spotifyCtrl) {
+          spotifyCtrl.loadUri(currentSong().uri);
+          /* loadUri auto-plays if was playing; playback_update will sync spin */
+        }
+
         clearAllSpin();
-        if (isPlaying) spinOn();
+        /* Spin is now driven by playback_update from Spotify.
+           In fallback mode, restore spin + timer manually.    */
+        if (spotifyFailed && isPlaying) {
+          spinOn();
+          startFallbackTimer();
+        } else if (spotifyFailed) {
+          /* stay paused */
+        }
 
         updateUI();
         isBusy = false;
       }, SWAP_MS);
     }
 
-    /* ── Click-to-front ───────────────────────────────────── */
+    /* ── Click-to-front ────────────────────────────────────── */
     recordEls.forEach(function (el) {
       el.style.cursor = 'pointer';
       el.addEventListener('click', function () {
         var clickedIdx  = recordEls.indexOf(el);
         var clickedSlot = slots[clickedIdx];
-        if (clickedSlot === 6 || isBusy) return; /* already front */
+        if (clickedSlot === 6 || isBusy) return;
 
         isBusy = true;
 
-        /* Rotate slots: clicked slot → 6, slots above it → shift down */
-        var newSlots = slots.slice();
+        var newSlots    = slots.slice();
+        var newSlotSong = slotSong.slice();
+
         recordEls.forEach(function (_, i) {
           if (slots[i] > clickedSlot) newSlots[i] = slots[i] - 1;
         });
         newSlots[clickedIdx] = 6;
-        slots = newSlots;
 
-        /* Rotate slotSong the same way */
-        var newSlotSong = slotSong.slice();
         for (var s = clickedSlot; s < 6; s++) newSlotSong[s] = slotSong[s + 1];
         newSlotSong[6] = slotSong[clickedSlot];
+
+        slots    = newSlots;
         slotSong = newSlotSong;
 
-        /* Animate */
         var shifting = recordEls.map(function (_, i) { return i; });
         applyPos(shifting);
 
         setTimeout(function () {
           recordEls.forEach(function (e) { e.classList.remove('is-shifting'); });
-          /* Update front label image */
           recordEls[slots.indexOf(6)].querySelector('.record-label').src =
             'assets/' + songs[slotSong[6]].img;
+
+          if (spotifyCtrl) {
+            spotifyCtrl.loadUri(currentSong().uri);
+          }
+
           clearAllSpin();
-          if (isPlaying) spinOn();
+          if (spotifyFailed && isPlaying) {
+            spinOn();
+            startFallbackTimer();
+          }
+
           updateUI();
           isBusy = false;
         }, SWAP_MS);
       });
     });
 
-    /* ── Play / pause ─────────────────────────────────────── */
+    /* ── Play / pause button ───────────────────────────────── */
     playBtn.addEventListener('click', function () {
-      isPlaying = !isPlaying;
-      playBtn.setAttribute('aria-label', isPlaying ? 'Pause' : 'Play');
-      playBtn.style.opacity = isPlaying ? '1' : '0.6';
-      if (isPlaying) { spinOn(); startTimer(); }
-      else           { spinPause(); clearInterval(timerId); timerId = null; }
+      if (spotifyCtrl) {
+        /* Spotify is source of truth — just toggle and let
+           playback_update sync isPlaying + spin             */
+        spotifyCtrl.togglePlay();
+      } else {
+        /* Fallback: control spin and timer directly */
+        isPlaying = !isPlaying;
+        playBtn.style.opacity = isPlaying ? '1' : '0.6';
+        playBtn.setAttribute('aria-label', isPlaying ? 'Pause' : 'Play');
+        if (isPlaying) { spinOn(); if (spotifyFailed) startFallbackTimer(); }
+        else           { spinPause(); clearInterval(timerId); timerId = null; }
+      }
     });
 
-    /* ── Next / Prev ──────────────────────────────────────── */
+    /* ── Next / Prev ───────────────────────────────────────── */
     nextBtn.addEventListener('click', function () { go(1);  });
     prevBtn.addEventListener('click', function () { go(-1); });
 
-    /* ── Re-apply positions on resize ─────────────────────── */
+    /* ── Re-apply positions on resize ──────────────────────── */
     var resizeTimer;
     window.addEventListener('resize', function () {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(function () { applyPos([]); }, 150);
     });
 
-    /* ── Init ─────────────────────────────────────────────── */
+    /* ── Init ──────────────────────────────────────────────── */
     updateUI();
-    /* Start with play button visually dimmed (paused state) */
-    playBtn.style.opacity = '0.6';
+    playBtn.style.opacity = '0.6'; /* start paused */
   })();
   </script>
 </body>
