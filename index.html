@@ -27,6 +27,7 @@
       --content-width:    1136px;
       --nav-width:        700px;
       --breakpoint:       desktop; /* read by JS via getComputedStyle */
+      --book-open-width:  340px;   /* total open card width; read by JS */
     }
 
     /* =============================================
@@ -786,7 +787,7 @@
        TABLET BREAKPOINT  (≤776px — Figma tablet frame width)
        ============================================= */
     @media (max-width: 776px) {
-      :root { --breakpoint: tablet; }
+      :root { --breakpoint: tablet; --book-open-width: 260px; }
 
       .page-wrapper {
         padding: 40px 16px;
@@ -891,7 +892,7 @@
        MOBILE BREAKPOINT  (≤383px — Figma mobile frame width)
        ============================================= */
     @media (max-width: 430px) {
-      :root { --breakpoint: mobile; }
+      :root { --breakpoint: mobile; --book-open-width: 220px; }
 
       .page-wrapper {
         padding: 40px 16px;
@@ -1022,6 +1023,152 @@
     .record.is-shifting {
       transition: left 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
                   top  0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    /* =============================================
+       BOOKSHELF — CLICK STATE
+       ============================================= */
+
+    /* Slot: flex item in bookshelf-row; wraps spine button + detail panel */
+    .book-slot {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-end;
+      flex-shrink: 0;
+      position: relative;
+      border-radius: 12px;
+      transition: transform 450ms cubic-bezier(0.34, 1.4, 0.64, 1),
+                  box-shadow 300ms ease,
+                  background 200ms ease,
+                  border-color 200ms ease;
+    }
+
+    /* Reset button to look like the original spine div */
+    button.book-spine {
+      border: none;
+      padding: 0;
+      font: inherit;
+      cursor: pointer;
+      background: transparent; /* actual bg comes from inline style */
+      text-align: left;
+      flex-shrink: 0;
+      /* overflow, border-radius, display:flex already set by existing .book-spine rule */
+    }
+
+    button.book-spine:focus-visible {
+      outline: 2px solid var(--text-dark);
+      outline-offset: 2px;
+      border-radius: 3px;
+    }
+    /* Suppress browser default focus ring for mouse/touch clicks */
+    button.book-spine:focus:not(:focus-visible) {
+      outline: none;
+    }
+
+    /* Open card: slot becomes the card container; sits flush on the shelf.
+       Height is set to match the spine's inline height by JS.
+       overflow:hidden prevents the detail panel from pushing the slot taller. */
+    .book-slot.is-open {
+      background: #fff;
+      border: 0.5px solid var(--border-card);
+      box-shadow: var(--shadow-card);
+      z-index: 20;
+      align-items: stretch;
+      overflow: hidden;
+    }
+
+    /* Spine inside open card: left-rounded. Keeps its inline height;
+       slot height is set to match by JS so they're always identical. */
+    .book-slot.is-open > button.book-spine {
+      border-radius: 12px 0 0 12px !important;
+      overflow: hidden;
+    }
+
+    /* Detail panel — hidden at rest, expands right on open */
+    .book-detail {
+      width: 0;
+      min-width: 0;
+      overflow: hidden;
+      opacity: 0;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      /* width and opacity transition; height is unconstrained so text never clips */
+      transition: width 450ms cubic-bezier(0.34, 1.4, 0.64, 1),
+                  opacity 200ms ease;
+    }
+
+    .book-slot.is-open .book-detail {
+      opacity: 1;
+      padding: 8px 8px 8px 8px;
+      /* width is set by JS: --book-open-width minus spine button's offsetWidth */
+    }
+
+    /* Detail text typography */
+    .bd-title {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      line-height: 1.2;
+      color: var(--text-dark);
+      margin: 0 0 2px;
+      word-break: break-word;
+    }
+
+    .bd-author {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 1.3;
+      color: var(--text-muted);
+      margin: 0 0 4px;
+    }
+
+    .bd-category {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 400;
+      font-size: 10px;
+      letter-spacing: 0.8px;
+      line-height: 1.3;
+      color: var(--text-muted2);
+      text-transform: uppercase;
+      margin: 0;
+    }
+
+    .bd-divider {
+      border: none;
+      border-top: 1px solid var(--border-card);
+      margin: 5px 0;
+    }
+
+    .bd-desc {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 10px;
+      line-height: 1.5;
+      color: var(--text-dark);
+      margin: 0;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      /* Safety net: cap at 5 lines with ellipsis */
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 5;
+      overflow: hidden;
+    }
+
+    /* Desktop: lift the 736px cap so the shelf can accommodate an open card
+       (~1028px max) within the 1136px content area.
+       overflow-x: auto is kept on .bookshelf-row at all widths — it only
+       produces a visible scrollbar when content actually overflows, so at
+       common desktop widths (≥1100px) no scrollbar appears with any book open.
+       Using overflow:visible here would let content leak to the page level and
+       create a page-wide horizontal scrollbar instead. */
+    @media (min-width: 777px) {
+      .bookshelf-outer {
+        width: auto;
+        max-width: none;
+      }
     }
   </style>
 </head>
@@ -1181,136 +1328,253 @@
       <div class="bookshelf-row">
 
         <!-- Book 1: Thinking Fast and Slow -->
-        <div class="book-spine" style="background:#2d4a7a; height:194px; width:53px;">
-          <div class="book-spine-top" style="background:#1a2f52; height:5px;"></div>
-          <div class="book-spine-body" style="flex:1;">
-            <span class="book-spine-title" style="color:#fff;">Thinking Fast and Slow</span>
-            <span class="book-spine-author" style="color:#fff;">Daniel<br>Kahneman</span>
+        <div class="book-slot" data-book="0">
+          <button class="book-spine" aria-expanded="false" aria-controls="book-detail-0" style="background:#2d4a7a; height:194px; width:53px;">
+            <div class="book-spine-top" style="background:#1a2f52; height:5px;"></div>
+            <div class="book-spine-body" style="flex:1;">
+              <span class="book-spine-title" style="color:#fff;">Thinking Fast and Slow</span>
+              <span class="book-spine-author" style="color:#fff;">Daniel<br>Kahneman</span>
+            </div>
+            <div class="book-spine-bottom" style="background:#1a2f52; height:4px;"></div>
+          </button>
+          <div class="book-detail" id="book-detail-0" aria-hidden="true">
+            <p class="bd-title"></p>
+            <p class="bd-author"></p>
+            <p class="bd-category"></p>
+            <hr class="bd-divider" />
+            <p class="bd-desc"></p>
           </div>
-          <div class="book-spine-bottom" style="background:#1a2f52; height:4px;"></div>
         </div>
 
         <!-- Book 2: Beyond Good and Evil -->
-        <div class="book-spine" style="background:#6b7280; height:157px; width:48px;">
-          <div class="book-spine-top" style="background:#4b5563; height:4px;"></div>
-          <div class="book-spine-body" style="flex:1;">
-            <span class="book-spine-title" style="color:#f9fafb;">Beyond Good and Evil</span>
-            <span class="book-spine-author" style="color:#f9fafb;">Nietzsche</span>
+        <div class="book-slot" data-book="1">
+          <button class="book-spine" aria-expanded="false" aria-controls="book-detail-1" style="background:#6b7280; height:157px; width:48px;">
+            <div class="book-spine-top" style="background:#4b5563; height:4px;"></div>
+            <div class="book-spine-body" style="flex:1;">
+              <span class="book-spine-title" style="color:#f9fafb;">Beyond Good and Evil</span>
+              <span class="book-spine-author" style="color:#f9fafb;">Nietzsche</span>
+            </div>
+          </button>
+          <div class="book-detail" id="book-detail-1" aria-hidden="true">
+            <p class="bd-title"></p>
+            <p class="bd-author"></p>
+            <p class="bd-category"></p>
+            <hr class="bd-divider" />
+            <p class="bd-desc"></p>
           </div>
         </div>
 
         <!-- Book 3: Babel -->
-        <div class="book-spine" style="background:#e8dcc8; height:188px; width:50px;">
-          <div class="book-spine-top" style="background:#c8b89a; height:5px;"></div>
-          <div class="book-spine-body" style="flex:1;">
-            <span class="book-spine-title" style="color:#4a3728;">BABEL</span>
-            <div style="height:1px; background:#4a3728; opacity:0.4; width:70%; margin:2px auto;"></div>
-            <span class="book-spine-author" style="color:#4a3728;">RF Kuang</span>
+        <div class="book-slot" data-book="2">
+          <button class="book-spine" aria-expanded="false" aria-controls="book-detail-2" style="background:#e8dcc8; height:188px; width:50px;">
+            <div class="book-spine-top" style="background:#c8b89a; height:5px;"></div>
+            <div class="book-spine-body" style="flex:1;">
+              <span class="book-spine-title" style="color:#4a3728;">BABEL</span>
+              <div style="height:1px; background:#4a3728; opacity:0.4; width:70%; margin:2px auto;"></div>
+              <span class="book-spine-author" style="color:#4a3728;">RF Kuang</span>
+            </div>
+            <div class="book-spine-bottom" style="background:#c8b89a; height:4px;"></div>
+          </button>
+          <div class="book-detail" id="book-detail-2" aria-hidden="true">
+            <p class="bd-title"></p>
+            <p class="bd-author"></p>
+            <p class="bd-category"></p>
+            <hr class="bd-divider" />
+            <p class="bd-desc"></p>
           </div>
-          <div class="book-spine-bottom" style="background:#c8b89a; height:4px;"></div>
         </div>
 
         <!-- Book 4: Dark Matter -->
-        <div class="book-spine" style="background:#3a3a3a; height:169px; width:33px;">
-          <div class="book-spine-top" style="background:#222; height:4px;"></div>
-          <div class="book-spine-body" style="flex:1;">
-            <span class="book-spine-title" style="color:#fff;">Dark Matter</span>
-            <span class="book-spine-author" style="color:#fff;">Blake<br>Crouch</span>
+        <div class="book-slot" data-book="3">
+          <button class="book-spine" aria-expanded="false" aria-controls="book-detail-3" style="background:#3a3a3a; height:169px; width:33px;">
+            <div class="book-spine-top" style="background:#222; height:4px;"></div>
+            <div class="book-spine-body" style="flex:1;">
+              <span class="book-spine-title" style="color:#fff;">Dark Matter</span>
+              <span class="book-spine-author" style="color:#fff;">Blake<br>Crouch</span>
+            </div>
+          </button>
+          <div class="book-detail" id="book-detail-3" aria-hidden="true">
+            <p class="bd-title"></p>
+            <p class="bd-author"></p>
+            <p class="bd-category"></p>
+            <hr class="bd-divider" />
+            <p class="bd-desc"></p>
           </div>
         </div>
 
         <!-- Book 5: Inferno -->
-        <div class="book-spine" style="background:#852221; height:182px; width:46px;">
-          <div class="book-spine-top" style="background:#a75c4b; height:5px;"></div>
-          <div class="book-spine-body" style="flex:1;">
-            <span class="book-spine-title" style="color:#fff0f3;">INFERNO</span>
-            <span class="book-spine-author" style="color:#fff;">Dante<br>Alighieri</span>
+        <div class="book-slot" data-book="4">
+          <button class="book-spine" aria-expanded="false" aria-controls="book-detail-4" style="background:#852221; height:182px; width:46px;">
+            <div class="book-spine-top" style="background:#a75c4b; height:5px;"></div>
+            <div class="book-spine-body" style="flex:1;">
+              <span class="book-spine-title" style="color:#fff0f3;">INFERNO</span>
+              <span class="book-spine-author" style="color:#fff;">Dante<br>Alighieri</span>
+            </div>
+            <div class="book-spine-bottom" style="background:#a75c4b; height:4px;"></div>
+          </button>
+          <div class="book-detail" id="book-detail-4" aria-hidden="true">
+            <p class="bd-title"></p>
+            <p class="bd-author"></p>
+            <p class="bd-category"></p>
+            <hr class="bd-divider" />
+            <p class="bd-desc"></p>
           </div>
-          <div class="book-spine-bottom" style="background:#a75c4b; height:4px;"></div>
         </div>
 
         <!-- Book 6: Whistling Vivaldi -->
-        <div class="book-spine" style="background:#bcd0d4; height:196px; width:63px;">
-          <div class="book-spine-top" style="background:#80898b; height:6px;"></div>
-          <div class="book-spine-body" style="flex:1;">
-            <div style="text-align:center;">
-              <span class="book-spine-title" style="color:#1a0f00; font-size:9px;">WHISTLING VIVALDI</span>
-              <div style="font-family:'Inter',sans-serif; font-weight:300; font-size:6px; color:#1a0f00; text-transform:uppercase;">How<br>stereotypes<br>affect us</div>
+        <div class="book-slot" data-book="5">
+          <button class="book-spine" aria-expanded="false" aria-controls="book-detail-5" style="background:#bcd0d4; height:196px; width:63px;">
+            <div class="book-spine-top" style="background:#80898b; height:6px;"></div>
+            <div class="book-spine-body" style="flex:1;">
+              <div style="text-align:center;">
+                <span class="book-spine-title" style="color:#1a0f00; font-size:9px;">WHISTLING VIVALDI</span>
+                <div style="font-family:'Inter',sans-serif; font-weight:300; font-size:6px; color:#1a0f00; text-transform:uppercase;">How<br>stereotypes<br>affect us</div>
+              </div>
+              <div style="height:1px; background:#1a0f00; opacity:0.5; width:70%; margin:2px auto;"></div>
+              <span class="book-spine-author" style="color:#1a0f00;">Claude M Steele</span>
             </div>
-            <div style="height:1px; background:#1a0f00; opacity:0.5; width:70%; margin:2px auto;"></div>
-            <span class="book-spine-author" style="color:#1a0f00;">Claude M Steele</span>
+            <div class="book-spine-bottom" style="background:#80898b; height:5px;"></div>
+          </button>
+          <div class="book-detail" id="book-detail-5" aria-hidden="true">
+            <p class="bd-title"></p>
+            <p class="bd-author"></p>
+            <p class="bd-category"></p>
+            <hr class="bd-divider" />
+            <p class="bd-desc"></p>
           </div>
-          <div class="book-spine-bottom" style="background:#80898b; height:5px;"></div>
         </div>
 
         <!-- Book 7: The Fifth Season -->
-        <div class="book-spine" style="background:#3a7a7a; height:163px; width:36px;">
-          <div class="book-spine-top" style="background:#255c5c; height:4px;"></div>
-          <div class="book-spine-body" style="flex:1;">
-            <span class="book-spine-title" style="color:#e0ffff;">The Fifth Season</span>
-            <span class="book-spine-author" style="color:#fff;">N.K.<br>Jemisin</span>
+        <div class="book-slot" data-book="6">
+          <button class="book-spine" aria-expanded="false" aria-controls="book-detail-6" style="background:#3a7a7a; height:163px; width:36px;">
+            <div class="book-spine-top" style="background:#255c5c; height:4px;"></div>
+            <div class="book-spine-body" style="flex:1;">
+              <span class="book-spine-title" style="color:#e0ffff;">The Fifth Season</span>
+              <span class="book-spine-author" style="color:#fff;">N.K.<br>Jemisin</span>
+            </div>
+          </button>
+          <div class="book-detail" id="book-detail-6" aria-hidden="true">
+            <p class="bd-title"></p>
+            <p class="bd-author"></p>
+            <p class="bd-category"></p>
+            <hr class="bd-divider" />
+            <p class="bd-desc"></p>
           </div>
         </div>
 
         <!-- Book 8: Design of Everyday Things -->
-        <div class="book-spine" style="background:rgba(255,206,33,0.95); height:179px; width:52px;">
-          <div class="book-spine-top" style="background:#b83434; height:5px;"></div>
-          <div class="book-spine-body" style="flex:1;">
-            <span class="book-spine-title" style="color:#1e1e1e;">DESIGN OF EVERYDAY THINGS</span>
-            <span class="book-spine-author" style="color:#000;">Don Norman</span>
+        <div class="book-slot" data-book="7">
+          <button class="book-spine" aria-expanded="false" aria-controls="book-detail-7" style="background:rgba(255,206,33,0.95); height:179px; width:52px;">
+            <div class="book-spine-top" style="background:#b83434; height:5px;"></div>
+            <div class="book-spine-body" style="flex:1;">
+              <span class="book-spine-title" style="color:#1e1e1e;">DESIGN OF EVERYDAY THINGS</span>
+              <span class="book-spine-author" style="color:#000;">Don Norman</span>
+            </div>
+            <div class="book-spine-bottom" style="background:#b83434; height:4px;"></div>
+          </button>
+          <div class="book-detail" id="book-detail-7" aria-hidden="true">
+            <p class="bd-title"></p>
+            <p class="bd-author"></p>
+            <p class="bd-category"></p>
+            <hr class="bd-divider" />
+            <p class="bd-desc"></p>
           </div>
-          <div class="book-spine-bottom" style="background:#b83434; height:4px;"></div>
         </div>
 
         <!-- Book 9: Continuous Discovery Habits -->
-        <div class="book-spine" style="background:#4a3f8c; height:188px; width:61px;">
-          <div class="book-spine-top" style="background:#2e2660; height:5px;"></div>
-          <div class="book-spine-body" style="flex:1;">
-            <span class="book-spine-title" style="color:#e8e4ff;">CONTINUOUS DISCOVERY HABITS</span>
-            <div style="height:1px; background:#e8e4ff; opacity:0.5; width:60%; margin:2px auto;"></div>
-            <span class="book-spine-author" style="color:#fff;">Teresa Torres</span>
+        <div class="book-slot" data-book="8">
+          <button class="book-spine" aria-expanded="false" aria-controls="book-detail-8" style="background:#4a3f8c; height:188px; width:61px;">
+            <div class="book-spine-top" style="background:#2e2660; height:5px;"></div>
+            <div class="book-spine-body" style="flex:1;">
+              <span class="book-spine-title" style="color:#e8e4ff;">CONTINUOUS DISCOVERY HABITS</span>
+              <div style="height:1px; background:#e8e4ff; opacity:0.5; width:60%; margin:2px auto;"></div>
+              <span class="book-spine-author" style="color:#fff;">Teresa Torres</span>
+            </div>
+            <div class="book-spine-bottom" style="background:#2e2660; height:4px;"></div>
+          </button>
+          <div class="book-detail" id="book-detail-8" aria-hidden="true">
+            <p class="bd-title"></p>
+            <p class="bd-author"></p>
+            <p class="bd-category"></p>
+            <hr class="bd-divider" />
+            <p class="bd-desc"></p>
           </div>
-          <div class="book-spine-bottom" style="background:#2e2660; height:4px;"></div>
         </div>
 
         <!-- Book 10: White Nights -->
-        <div class="book-spine" style="background:#cfcfcf; height:172px; width:46px;">
-          <div class="book-spine-top" style="background:#8a8a8a; height:5px;"></div>
-          <div class="book-spine-body" style="flex:1;">
-            <span class="book-spine-title" style="color:#000;">WHITE NIGHTS</span>
-            <span class="book-spine-author" style="color:#000;">Fyodor<br>Dostoevsky</span>
+        <div class="book-slot" data-book="9">
+          <button class="book-spine" aria-expanded="false" aria-controls="book-detail-9" style="background:#cfcfcf; height:172px; width:46px;">
+            <div class="book-spine-top" style="background:#8a8a8a; height:5px;"></div>
+            <div class="book-spine-body" style="flex:1;">
+              <span class="book-spine-title" style="color:#000;">WHITE NIGHTS</span>
+              <span class="book-spine-author" style="color:#000;">Fyodor<br>Dostoevsky</span>
+            </div>
+            <div class="book-spine-bottom" style="background:#8a8a8a; height:4px;"></div>
+          </button>
+          <div class="book-detail" id="book-detail-9" aria-hidden="true">
+            <p class="bd-title"></p>
+            <p class="bd-author"></p>
+            <p class="bd-category"></p>
+            <hr class="bd-divider" />
+            <p class="bd-desc"></p>
           </div>
-          <div class="book-spine-bottom" style="background:#8a8a8a; height:4px;"></div>
         </div>
 
         <!-- Book 11: Addie Larue -->
-        <div class="book-spine" style="background:#e8d7c4; height:182px; width:41px;">
-          <div class="book-spine-top" style="background:#a67c52; height:5px;"></div>
-          <div class="book-spine-body" style="flex:1;">
-            <span class="book-spine-title" style="color:#5a3a1e;">ADDIE LARUE</span>
-            <span class="book-spine-author" style="color:#8a5a3a;">VE Schwab</span>
+        <div class="book-slot" data-book="10">
+          <button class="book-spine" aria-expanded="false" aria-controls="book-detail-10" style="background:#e8d7c4; height:182px; width:41px;">
+            <div class="book-spine-top" style="background:#a67c52; height:5px;"></div>
+            <div class="book-spine-body" style="flex:1;">
+              <span class="book-spine-title" style="color:#5a3a1e;">ADDIE LARUE</span>
+              <span class="book-spine-author" style="color:#8a5a3a;">VE Schwab</span>
+            </div>
+            <div class="book-spine-bottom" style="background:#a67c52; height:4px;"></div>
+          </button>
+          <div class="book-detail" id="book-detail-10" aria-hidden="true">
+            <p class="bd-title"></p>
+            <p class="bd-author"></p>
+            <p class="bd-category"></p>
+            <hr class="bd-divider" />
+            <p class="bd-desc"></p>
           </div>
-          <div class="book-spine-bottom" style="background:#a67c52; height:4px;"></div>
         </div>
 
         <!-- Book 12: Mismatch -->
-        <div class="book-spine" style="background:#d5cefa; height:188px; width:57px;">
-          <div class="book-spine-top" style="background:#2e2660; height:5px;"></div>
-          <div class="book-spine-body" style="flex:1;">
-            <span class="book-spine-title" style="color:#000;">MISMATCH: HOW INCLUSION SHAPES DESIGN</span>
-            <span class="book-spine-author" style="color:#000;">Kat Holmes</span>
+        <div class="book-slot" data-book="11">
+          <button class="book-spine" aria-expanded="false" aria-controls="book-detail-11" style="background:#d5cefa; height:188px; width:57px;">
+            <div class="book-spine-top" style="background:#2e2660; height:5px;"></div>
+            <div class="book-spine-body" style="flex:1;">
+              <span class="book-spine-title" style="color:#000;">MISMATCH: HOW INCLUSION SHAPES DESIGN</span>
+              <span class="book-spine-author" style="color:#000;">Kat Holmes</span>
+            </div>
+            <div class="book-spine-bottom" style="background:#2e2660; height:4px;"></div>
+          </button>
+          <div class="book-detail" id="book-detail-11" aria-hidden="true">
+            <p class="bd-title"></p>
+            <p class="bd-author"></p>
+            <p class="bd-category"></p>
+            <hr class="bd-divider" />
+            <p class="bd-desc"></p>
           </div>
-          <div class="book-spine-bottom" style="background:#2e2660; height:4px;"></div>
         </div>
 
         <!-- Book 13: Lightbringer -->
-        <div class="book-spine" style="background:#333; height:157px; width:51px;">
-          <div class="book-spine-top" style="background:rgba(111,104,88,0.95); height:5px;"></div>
-          <div class="book-spine-body" style="flex:1;">
-            <span class="book-spine-title" style="color:#fff8f6;">LIGHT BRINGER</span>
-            <span class="book-spine-author" style="color:#fff;">Peirce Brown</span>
+        <div class="book-slot" data-book="12">
+          <button class="book-spine" aria-expanded="false" aria-controls="book-detail-12" style="background:#333; height:157px; width:51px;">
+            <div class="book-spine-top" style="background:rgba(111,104,88,0.95); height:5px;"></div>
+            <div class="book-spine-body" style="flex:1;">
+              <span class="book-spine-title" style="color:#fff8f6;">LIGHT BRINGER</span>
+              <span class="book-spine-author" style="color:#fff;">Peirce Brown</span>
+            </div>
+            <div class="book-spine-bottom" style="background:rgba(111,104,88,0.95); height:4px;"></div>
+          </button>
+          <div class="book-detail" id="book-detail-12" aria-hidden="true">
+            <p class="bd-title"></p>
+            <p class="bd-author"></p>
+            <p class="bd-category"></p>
+            <hr class="bd-divider" />
+            <p class="bd-desc"></p>
           </div>
-          <div class="book-spine-bottom" style="background:rgba(111,104,88,0.95); height:4px;"></div>
         </div>
 
       </div><!-- /bookshelf-row -->
@@ -1877,6 +2141,203 @@
     /* ── Init ──────────────────────────────────────────────── */
     updateUI();
     playBtn.style.opacity = '0.6'; /* start paused */
+  })();
+  </script>
+  <script>
+  (function () {
+    /* ── Book data ─────────────────────────────────────────────────
+       Descriptions are intentionally long placeholders (~3 sentences)
+       to test that text never clips. Replace with real copy later.
+    ──────────────────────────────────────────────────────────────── */
+    var books = [
+      {
+        title: 'Thinking, Fast and Slow',
+        author: 'Daniel Kahneman',
+        category: 'PSYCHOLOGY · BEHAVIORAL ECONOMICS',
+        desc: 'Kahneman unpacks the two systems that drive how we think — fast and intuitive vs. slow and deliberate — and the biases that trip us up in everyday decisions. Changed how I approach problem framing in design.'
+      },
+      {
+        title: 'Beyond Good and Evil',
+        author: 'Friedrich Nietzsche',
+        category: 'PHILOSOPHY · ETHICS',
+        desc: 'Nietzsche challenges the assumption that conventional morality is objective truth and dares you to examine the values you\'ve inherited rather than chosen. Dense and rewarding — best read slowly, in small doses.'
+      },
+      {
+        title: 'Babel',
+        author: 'R.F. Kuang',
+        category: 'FICTION · HISTORICAL FANTASY',
+        desc: 'An alternate-history Oxford novel where translation is literal magic and colonialism powers it all. Kuang writes with fury and precision — the academic world feels both cosy and deeply sinister. I finished it in two sittings.'
+      },
+      {
+        title: 'Dark Matter',
+        author: 'Blake Crouch',
+        category: 'FICTION · SCIENCE FICTION',
+        desc: 'A propulsive thriller built on the many-worlds interpretation of quantum mechanics. The science is hand-wavy but the emotional stakes land hard. Great for a weekend when you want your brain to run a little too fast.'
+      },
+      {
+        title: 'Inferno',
+        author: 'Dante Alighieri',
+        category: 'POETRY · PHILOSOPHY',
+        desc: 'Dante walks through Hell guided by Virgil, and the 14th-century allegory reads as sharp commentary on power and corruption. The imagery is wild and specific in a way only religious terror can produce.'
+      },
+      {
+        title: 'Whistling Vivaldi',
+        author: 'Claude M. Steele',
+        category: 'PSYCHOLOGY · RACE',
+        desc: 'Steele\'s research on stereotype threat — the idea that awareness of a stereotype can undermine performance, even without believing it — is some of the most important social psychology in decades. Essential for anyone designing products for diverse audiences.'
+      },
+      {
+        title: 'The Fifth Season',
+        author: 'N.K. Jemisin',
+        category: 'FICTION · FANTASY',
+        desc: 'One of the most formally inventive fantasy novels I\'ve read — uses second person in a way that feels earned, not gimmicky. The worldbuilding is merciless and the metaphors for systemic oppression are never subtle. Won the Hugo for good reason.'
+      },
+      {
+        title: 'The Design of Everyday Things',
+        author: 'Don Norman',
+        category: 'DESIGN · COGNITIVE SCIENCE',
+        desc: 'The book that gave us "affordances" and "discoverability" as design vocabulary. Norman\'s examples of bad door handles and confusing stove controls are still the best illustrations of why design is never just aesthetics. Classic for a reason.'
+      },
+      {
+        title: 'Continuous Discovery Habits',
+        author: 'Teresa Torres',
+        category: 'PRODUCT · UX RESEARCH',
+        desc: 'Torres makes a compelling case that discovery isn\'t a phase before building — it\'s a continuous practice woven into the work itself. The opportunity solution tree is immediately actionable. Most practically useful product thinking book I\'ve read.'
+      },
+      {
+        title: 'White Nights',
+        author: 'Fyodor Dostoevsky',
+        category: 'FICTION · LITERARY',
+        desc: 'A short, melancholy novella about a dreamer who falls in love over four nights in St. Petersburg. Dostoevsky at his most tender — none of the grand suffering of his longer work, just a quiet ache. I reread it every winter.'
+      },
+      {
+        title: 'The Invisible Life of Addie LaRue',
+        author: 'V.E. Schwab',
+        category: 'FICTION · FANTASY',
+        desc: 'Addie makes a deal to live forever but be forgotten by everyone she meets. Schwab turns this into a meditation on memory, identity, and what it means to leave a mark on the world. One of those books I kept putting down just to sit with.'
+      },
+      {
+        title: 'Mismatch',
+        author: 'Kat Holmes',
+        category: 'DESIGN · INCLUSION',
+        desc: 'Holmes reframes accessibility as the central challenge of design — the people most excluded are almost always those whose needs would make the product better for everyone. Short, sharp, and genuinely changed how I think about edge cases.'
+      },
+      {
+        title: 'Light Bringer',
+        author: 'Pierce Brown',
+        category: 'FICTION · SCIENCE FICTION',
+        desc: 'The sixth book in the Red Rising saga and arguably the best since the original trilogy — Brown finds a new gear after a couple of slower middle entries. If you\'re already in the series, this is the payoff book.'
+      }
+    ];
+
+    /* ── DOM ──────────────────────────────────────────────────── */
+    var shelfCard  = document.querySelector('.bookshelf-card');
+    var shelfSlots = Array.from(document.querySelectorAll('.book-slot'));
+    var openIdx    = null;
+
+    /* ── Helpers ─────────────────────────────────────────────── */
+    function reducedMotion() {
+      return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }
+
+    /* ── Close ────────────────────────────────────────────────── */
+    function closeAll(returnFocusIdx) {
+      if (openIdx === null) return;
+      var idx    = openIdx;
+      var slot   = shelfSlots[idx];
+      var btn    = slot.querySelector('button.book-spine');
+      var detail = slot.querySelector('.book-detail');
+
+      openIdx = null;
+      slot.classList.remove('is-open');
+      slot.style.height = '';
+      btn.setAttribute('aria-expanded', 'false');
+      detail.setAttribute('aria-hidden', 'true');
+      detail.style.width = '0';
+
+      if (returnFocusIdx != null) {
+        shelfSlots[returnFocusIdx].querySelector('button.book-spine').focus();
+      }
+    }
+
+    /* ── Open ─────────────────────────────────────────────────── */
+    function openBook(idx) {
+      /* Toggle: clicking open book closes it */
+      if (openIdx === idx) {
+        closeAll();
+        return;
+      }
+
+      /* Switch: close previous without returning focus */
+      if (openIdx !== null) {
+        var prevSlot   = shelfSlots[openIdx];
+        var prevBtn    = prevSlot.querySelector('button.book-spine');
+        var prevDetail = prevSlot.querySelector('.book-detail');
+        prevSlot.classList.remove('is-open');
+        prevSlot.style.height = '';
+        prevBtn.setAttribute('aria-expanded', 'false');
+        prevDetail.setAttribute('aria-hidden', 'true');
+        prevDetail.style.width = '0';
+      }
+
+      openIdx = idx;
+      var slot   = shelfSlots[idx];
+      var btn    = slot.querySelector('button.book-spine');
+      var detail = slot.querySelector('.book-detail');
+      var book   = books[idx];
+
+      /* Populate content */
+      detail.querySelector('.bd-title').textContent    = book.title;
+      detail.querySelector('.bd-author').textContent   = book.author;
+      detail.querySelector('.bd-category').textContent = book.category;
+      detail.querySelector('.bd-desc').textContent     = book.desc;
+
+      /* Pin slot height to the spine's inline height so card = spine height */
+      var spineH = parseFloat(btn.style.height);
+      if (spineH) slot.style.height = spineH + 'px';
+
+      /* Open: class triggers CSS transitions (border, shadow) */
+      slot.classList.add('is-open');
+      btn.setAttribute('aria-expanded', 'true');
+      detail.setAttribute('aria-hidden', 'false');
+
+      /* Detail width = total card width − spine width.
+         Card width is read from --book-open-width, which CSS sets per breakpoint.
+         Spine width comes from the button's actual rendered offsetWidth. */
+      var cardW       = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--book-open-width')) || 340;
+      var spineW      = btn.offsetWidth;
+      var detailW     = Math.max(80, cardW - spineW);
+      detail.style.width = detailW + 'px';
+
+      /* Scroll the opened card into view */
+      var behavior = reducedMotion() ? 'auto' : 'smooth';
+      slot.scrollIntoView({ behavior: behavior, block: 'nearest', inline: 'nearest' });
+    }
+
+    /* ── Button clicks ────────────────────────────────────────── */
+    shelfSlots.forEach(function (slot, i) {
+      var btn = slot.querySelector('button.book-spine');
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation(); /* prevent document click from immediately closing */
+        openBook(i);
+      });
+    });
+
+    /* ── Click outside shelf ──────────────────────────────────── */
+    document.addEventListener('click', function (e) {
+      if (openIdx !== null && !e.target.closest('.bookshelf-card')) {
+        closeAll();
+      }
+    });
+
+    /* ── Escape key ───────────────────────────────────────────── */
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && openIdx !== null) {
+        var idx = openIdx; /* capture before closeAll resets it */
+        closeAll(idx);     /* returns focus to the button that was open */
+      }
+    });
+
   })();
   </script>
 </body>
