@@ -1000,13 +1000,17 @@
     .ht-body-text p { margin-bottom: 14px; }
     .ht-body-text p:last-child { margin-bottom: 0; }
 
-    /* ── Current Stack layout ─────────────────── */
+    /* ── Current Stack layout ─────────────────────────────────────
+       Each group: left col = label, right col = desc + chips + text items.
+       To add a group: add an object to the groups array in HT_DATA.stack.
+       To add a tool: add to group.tools. For a text-only row add textItems[].
+    ──────────────────────────────────────────────────────────────── */
     .ht-stack-groups { display: flex; flex-direction: column; gap: 0; }
     .ht-stack-group {
       display: grid;
-      grid-template-columns: 140px 1fr;
+      grid-template-columns: 130px 1fr;
       gap: 0 20px;
-      padding: 20px 0;
+      padding: 24px 0;
       border-top: 1px solid rgba(0,0,0,0.08);
     }
     .ht-stack-group:first-child { border-top: none; padding-top: 4px; }
@@ -1020,41 +1024,66 @@
       padding-top: 2px;
       line-height: 1.4;
     }
-    .ht-stack-group__tools { display: flex; flex-direction: column; gap: 16px; }
-    .ht-tool {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-    }
-    .ht-tool__icon {
-      width: 32px;
-      height: 32px;
-      object-fit: contain;
-      flex-shrink: 0;
-      border-radius: 6px;
-    }
-    .ht-tool__icon-row {
-      display: flex;
-      gap: 6px;
-      flex-shrink: 0;
-    }
-    .ht-tool__icon-row .ht-tool__icon { width: 28px; height: 28px; }
-    .ht-tool__info { flex: 1; }
-    .ht-tool__name {
-      font-family: 'Inter', sans-serif;
-      font-weight: 600;
-      font-size: 13px;
-      line-height: 1.3;
-      color: var(--text-dark);
-      margin-bottom: 2px;
-    }
-    .ht-tool__desc {
+    .ht-stack-group__content { display: flex; flex-direction: column; gap: 12px; }
+    .ht-stack-desc {
       font-family: 'Inter', sans-serif;
       font-weight: 400;
-      font-size: 12px;
+      font-size: 13px;
       line-height: 1.5;
       color: var(--text-muted);
     }
+    /* Chip row: wraps when chips don't fit */
+    .ht-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .ht-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 6px 10px;
+      background: #fff;
+    }
+    .ht-chip__icon {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+      flex-shrink: 0;
+      display: block;
+    }
+    .ht-chip__name {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 13px;
+      line-height: 1.3;
+      color: var(--text-dark);
+      white-space: nowrap;
+    }
+    /* Text-only items row: bullet separator drawn in CSS */
+    .ht-text-items {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0;
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--text-dark);
+    }
+    .ht-text-item { white-space: nowrap; }
+    .ht-text-item + .ht-text-item::before {
+      content: '\2022'; /* bullet */
+      margin: 0 8px;
+      color: var(--text-muted2);
+      font-size: 10px;
+      vertical-align: middle;
+    }
+    /* Wide modal variant for the stack modal (more content) */
+    .ht-modal__inner--wide { width: 700px; }
 
     /* ── "Why I Love/♡ Design" label switch ─────
        At ≤776px (tablet + mobile) show the short ♡ label;
@@ -2878,12 +2907,22 @@
   (function () {
     /* ═══════════════════════════════════════════════════════════════
        HOT TAKES DATA
-       Edit the content blocks below. Structure must not change.
-       · In body paragraphs, wrap words in <strong> for bold.
-       · Paragraph breaks are separate entries in the paragraphs array.
-       · Stack groups: each group has a label and an array of tools.
-         Each tool has: name, icon (src), desc.
-         For the multi-icon row (Photoshop/AE/Premiere), use icons:[].
+       Edit the content blocks below.
+
+       ai / design:
+         · paragraphs[]: one entry per paragraph. Use <strong> for bold.
+         · ai only: headline is pinned above the divider on mobile.
+
+       stack.groups[]:  one object per group.
+         · label:      left-column heading (IBM Plex Mono caps)
+         · desc:       short description above the chips
+         · tools[]:    array of tool chips. Each chip has:
+             icon (src path), name (text label)
+             For a multi-icon chip with one label: icons[] instead of icon
+         · textItems[]: optional. Plain-text list separated by bullet dots.
+             Add or remove strings freely. Bullets are drawn in CSS.
+       To add a group: add an object to groups[].
+       To add a tool: add to group.tools[].
     ═══════════════════════════════════════════════════════════════ */
     var HT_DATA = {
       ai: {
@@ -2903,42 +2942,37 @@
         title: 'My Hot Takes - My Current Tool Stack',
         groups: [
           {
-            label: 'Think & Align',
+            label: 'Research and Think',
+            desc: 'Understand users, explore problems, and pressure-test ideas through research, collaboration, and a little help from AI',
             tools: [
-              {
-                name: 'Marker and White Board',
-                icon: 'assets/marker-whiteboard-icon.png',
-                desc: 'Tried and true. Map complex flows, untangle ideas, and get everyone on the same page before jumping into the details'
-              },
-              {
-                name: 'Claude \u2014 Chat and Cowork',
-                icon: 'assets/claude-icon.png',
-                desc: 'My sounding board for pressure testing ideas, and occasionally unsticking a tangled mind'
-              }
+              { icon: 'assets/whiteboard-logo.svg',  name: 'White Board' },
+              { icon: 'assets/claude-logo.svg',       name: 'Chat and Cowork' }
+            ],
+            textItems: ['Surveys', 'User Interviews', 'Testing']
+          },
+          {
+            label: 'Design & Prototype',
+            desc: 'From early wireframes to high-fidelity UI, interactive prototypes, and rapid experimentation. This is where ideas start taking shape.',
+            tools: [
+              { icon: 'assets/figma-logo.svg',  name: 'Figma' },
+              { icon: 'assets/claude-logo.svg', name: 'Code and Design' }
             ]
           },
           {
-            label: 'Design & Iterate',
+            label: 'Build and Deploy',
+            desc: 'Taking ideas beyond the mockup. I use development tools to build, manage, and get functional experiences out into the world.',
             tools: [
-              {
-                name: 'Figma',
-                icon: 'assets/figma-icon.png',
-                desc: 'Early wireframes to high-fidelity mocks, I still spend a good chunk of my time here \u2014 I still love you, Figma!'
-              },
-              {
-                name: 'Claude \u2014 Code and Design',
-                icon: 'assets/claude-icon.png',
-                desc: 'Building functional prototypes and exploring interactions, and accelerating design exploration beyond static mockups'
-              }
+              { icon: 'assets/github-logo.svg', name: 'Github' },
+              { icon: 'assets/vercel-logo.svg', name: 'Vercel' }
             ]
           },
           {
-            label: 'Creating from Scratch',
+            label: 'Create and Polish',
+            desc: 'For when the work calls for something a little more custom. I get my hands dirty with custom imagery, animation, and visual finishing touches.',
             tools: [
               {
-                name: 'Photoshop, After Effects, Premiere',
-                icons: ['assets/photoshop-logo.png', 'assets/after-effects-logo.png', 'assets/premiere-logo.png'],
-                desc: 'Bonus round for when the work just calls for something more custom \u2014 I can get into the weeds with custom imagery and animation'
+                icons: ['assets/photoshop-logo.svg', 'assets/after-effects-logo.svg', 'assets/premiere-logo.svg'],
+                name: 'Photoshop, After Effects, Premiere'
               }
             ]
           }
@@ -2995,23 +3029,33 @@
       data.groups.forEach(function (group) {
         html += '<div class="ht-stack-group">';
         html += '<div class="ht-stack-group__label">' + group.label + '</div>';
-        html += '<div class="ht-stack-group__tools">';
+        html += '<div class="ht-stack-group__content">';
+        /* Description */
+        html += '<p class="ht-stack-desc">' + group.desc + '</p>';
+        /* Tool chips */
+        html += '<div class="ht-chip-row">';
         group.tools.forEach(function (tool) {
-          html += '<div class="ht-tool">';
+          html += '<div class="ht-chip">';
           if (tool.icons) {
-            html += '<div class="ht-tool__icon-row">';
+            /* Multi-icon chip: icons are decorative, one label for all */
             tool.icons.forEach(function (src) {
-              html += '<img class="ht-tool__icon" src="' + src + '" alt="" aria-hidden="true" />';
+              html += '<img class="ht-chip__icon" src="' + src + '" alt="" aria-hidden="true" />';
             });
-            html += '</div>';
           } else {
-            html += '<img class="ht-tool__icon" src="' + tool.icon + '" alt="" aria-hidden="true" />';
+            html += '<img class="ht-chip__icon" src="' + tool.icon + '" alt="" aria-hidden="true" />';
           }
-          html += '<div class="ht-tool__info">';
-          html += '<div class="ht-tool__name">' + tool.name + '</div>';
-          html += '<div class="ht-tool__desc">' + tool.desc + '</div>';
-          html += '</div></div>';
+          html += '<span class="ht-chip__name">' + tool.name + '</span>';
+          html += '</div>';
         });
+        html += '</div>';
+        /* Optional text-only items with CSS bullet separators */
+        if (group.textItems && group.textItems.length) {
+          html += '<div class="ht-text-items">';
+          group.textItems.forEach(function (item) {
+            html += '<span class="ht-text-item">' + item + '</span>';
+          });
+          html += '</div>';
+        }
         html += '</div></div>';
       });
       html += '</div>';
@@ -3099,6 +3143,8 @@
         modalTitle.textContent = data.title;
         modalBody.innerHTML    = bodyHtml;
         modalBody.scrollTop    = 0;
+        /* wider inner panel for the stack modal */
+        modal.querySelector('.ht-modal__inner').classList.toggle('ht-modal__inner--wide', id === 'stack');
         lockScroll();
         modal.showModal();
         /* move focus to close button after transition starts */
