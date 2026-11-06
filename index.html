@@ -354,64 +354,74 @@
 
     /* =============================================
        AI MEET THE FED CARD
-       — exact Figma measurements: card 548×495px
+       Robot scales via container query units (cqi) so it
+       tracks the card's own width at every grid size.
+       Container query on the card switches the eyebrow
+       between one-line (slash) and two-line (stacked) formats.
+       overflow:hidden clips the robot at the card's bottom
+       edge along the rounded corners.
        ============================================= */
     .ai-fed-card {
+      container-type: inline-size;
       position: relative;
       overflow: hidden;
       height: 495px;
-    }
-    /* Martin illustration container: left:62.5px, top:-21.5px, 525×516px */
-    .ai-fed-card .martin-container {
-      position: absolute;
-      left: 62.5px;
-      top: -21.5px;
-      width: 525px;
-      height: 516px;
-      overflow: hidden;
-      pointer-events: none;
-    }
-    /* Image within container: left:10.44%, top:23.58%, w:79.06%, h:80.57% */
-    .ai-fed-card .martin-img {
-      position: absolute;
-      left: 10.44%;
-      top: 23.58%;
-      width: 79.06%;
-      height: 80.57%;
-      object-fit: contain;
-      object-position: top left;
-    }
-    .ai-fed-card .ai-fed-heading {
-      position: absolute;
-      left: 47.5px;
-      top: 43.5px;
-      font-family: 'Work Sans', sans-serif;
-      font-weight: 600;
-      font-size: 42px;
-      letter-spacing: -1.68px;
-      line-height: 1.1;
-      color: var(--text-dark);
-      white-space: nowrap;
-      z-index: 2;
-    }
-    /* Speech bubble: left:356.5px, top:134.5px, w:141px */
-    .ai-fed-card .martin-speech {
-      position: absolute;
-      left: 356.5px;
-      top: 134.5px;
-      width: 141px;
+      padding: 32px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: white;
+      gap: 16px;
+    }
+
+    /* ── Eyebrow ───────────────────────────────── */
+    .ai-fed-eyebrow {
       font-family: 'IBM Plex Mono', monospace;
-      font-weight: 700;
-      font-size: 20px;
-      line-height: 1.5;
-      color: #2a5075;
-      text-align: center;
-      z-index: 3;
+      font-weight: 400;
+      font-size: 10px;         /* Figma desktop: 10px */
+      letter-spacing: 0.9px;
+      text-transform: uppercase;
+      line-height: 1.4;
+      color: var(--text-muted2);
+      position: relative;
+      z-index: 2;
+    }
+    /* Wide (one-line + slash) shown by default */
+    .ai-fed-eyebrow__wide  { display: block; }
+    .ai-fed-eyebrow__stack { display: none; }
+    /* Below 190px (mobile cards ~160-168px) → stacked, no slash */
+    @container (max-width: 190px) {
+      .ai-fed-eyebrow__wide  { display: none; }
+      .ai-fed-eyebrow__stack { display: block; }
+    }
+
+    /* ── Title ─────────────────────────────────── */
+    .ai-fed-title {
+      font-family: 'Work Sans', sans-serif;
+      font-weight: 600;
+      font-size: 42px;         /* Figma desktop: 42px */
+      letter-spacing: -0.04em; /* -1.68px at 42px; scales with font-size */
+      line-height: 1.1;
+      color: var(--text-dark);
+      position: relative;
+      z-index: 2;
+      white-space: nowrap;
+    }
+
+    /* ── Robot ─────────────────────────────────── */
+    /* Absolutely positioned to bottom-right.
+       bottom:0 → PNG bottom aligns with card bottom; overflow:hidden
+       on the card crops the robot at the card edge. */
+    .ai-fed-robot {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 78cqi;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .ai-fed-robot img {
+      display: block;
+      width: 100%;
+      height: auto;
     }
 
     /* =============================================
@@ -1169,19 +1179,23 @@
       }
       .work-placeholder-title { font-size: 18px; }
 
-      /* AI Meet the Fed: 180px, font-size 20 (robot image removed from HTML) */
+      /* AI Meet the Fed: tablet — Figma frame 316×180
+         explicit height matches the work-placeholder-card at this breakpoint.
+         All text/spacing in cqi so they scale proportionally with card width.
+         Calibrated: 6.33cqi title = 20px at 316px,
+                     3.16cqi eyebrow = 10px at 316px,
+                     3.8cqi  padding = ~12px at 316px */
       .ai-fed-card {
         height: 180px;
-        min-height: unset;
+        padding: 3.8cqi;
+        gap: 2.5cqi;
         border-radius: 20px;
       }
-      .ai-fed-card .ai-fed-heading {
-        font-size: 20px;
-        letter-spacing: -0.8px;
-        left: 20px;
-        top: 24px;
-      }
-      .ai-fed-card .martin-speech { display: none; }
+      .ai-fed-eyebrow { font-size: 3.16cqi; }
+      .ai-fed-title   { font-size: 6.33cqi; }
+      /* Robot: 65cqi ≈ 205px wide at 316px; height ≈ 203px > 180px
+         so bottom of robot clips naturally at card bottom edge */
+      .ai-fed-robot   { width: 65cqi; bottom: 0; right: 0; }
 
       /* Bookshelf: 24px radius, smaller title */
       .bookshelf-card { border-radius: 24px; }
@@ -1265,9 +1279,39 @@
       /* Work cards inherit from tablet */
       .work-placeholder-card { padding: 16px; }
 
-      /* AI card */
-      .ai-fed-card .ai-fed-heading { font-size: 20px; top: 16px; left: 16px; }
-      .ai-fed-card .martin-speech { display: none; }
+      /* AI Meet the Fed: mobile — Figma frame 160×180.
+         All spacing in cqi → proportional at any card width.
+         Live card is 167.5px at 375/390/430px viewports (capped by
+         max-width: 343px), so values are 4.7% larger than at 160px.
+         ─────────────────────────────────────────────────
+         Calibrated at 160px card:
+           8cqi    top padding    = 12.8px
+           5.5cqi  side padding   =  8.8px
+           2.5cqi  eyebrow→title gap = 4px
+           5cqi    eyebrow size   =  8px
+           9.375cqi title size    = 15px
+           10cqi   border-radius  = 16px  (lighter than 20px base)
+         ─────────────────────────────────────────────────
+         Eyebrow font: Inter 500, wide letter-spacing (0.15em).
+         Desktop uses IBM Plex Mono; mobile frame uses sans-serif. */
+      .ai-fed-card {
+        height: 180px;
+        padding: 8cqi 5.5cqi 5.5cqi;
+        gap: 2.5cqi;
+        border-radius: 20px;          /* matches all other work cards at mobile */
+        box-shadow: 0px 2px 8px rgba(12,12,13,0.07),
+                    0px 1px 2px rgba(12,12,13,0.04); /* lighter for compact card */
+      }
+      .ai-fed-eyebrow {
+        font-family: 'Inter', sans-serif; /* sans-serif per Figma mobile frame */
+        font-weight: 500;
+        font-size: 5cqi;               /* 8px at 160px */
+        letter-spacing: 0.15em;        /* wide spacing per design; scales with font */
+      }
+      .ai-fed-title   { font-size: 9.375cqi; } /* 15px at 160px */
+      /* Robot: 110cqi ≈ 176px at 160px (174px tall); card 180px →
+         robot nearly fills card height, bottom edge flush with card */
+      .ai-fed-robot   { width: 110cqi; bottom: 0; right: 0; }
 
       /* Music + hyper: both full width within 343px bottom-row */
       .music-card, .hyper-card { width: 100%; padding: 20px; }
@@ -1603,9 +1647,22 @@
         </article>
 
         <!-- AI Meet the Fed (NOT a placeholder) -->
+        <!-- To make the whole card a link later, wrap the article contents in <a href="..."> -->
         <article class="card ai-fed-card">
-          <div class="ai-fed-heading">AI, <br>Meet the Fed</div>
-          <div class="martin-speech">Hello...<br>I'm Martin!</div>
+          <p class="ai-fed-eyebrow">
+            <span class="ai-fed-eyebrow__wide">THE FEDERAL RESERVE / PRODUCT DESIGNER</span>
+            <span class="ai-fed-eyebrow__stack" aria-hidden="true">THE FEDERAL RESERVE<br>PRODUCT DESIGNER</span>
+          </p>
+          <h2 class="ai-fed-title">AI,<br>Meet the Fed</h2>
+          <div class="ai-fed-robot">
+            <img
+              src="assets/ai-meet-the-fed-robot.png"
+              alt="Martin, a friendly robot saying: Hello... I'm Martin!"
+              width="656"
+              height="648"
+              loading="lazy"
+            />
+          </div>
         </article>
       </div>
 
