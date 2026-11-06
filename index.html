@@ -1705,11 +1705,14 @@
           <p class="hot-takes-label">My Hot Takes</p>
           <img class="expand-icon" src="assets/elements.svg" alt="" aria-hidden="true" />
         </button>
-        <article class="card hot-takes-card">
-          <h2 class="hot-takes-title">Say Things</h2>
+        <button class="card hot-takes-card ht-trigger" data-modal="challenging" aria-haspopup="dialog" aria-label="What's challenging" type="button">
+          <h2 class="hot-takes-title">
+            <span class="ht-label-long">What's Challenging</span>
+            <span class="ht-label-short" aria-hidden="true">What's Hard</span>
+          </h2>
           <p class="hot-takes-label">My Hot Takes</p>
-          <img class="expand-icon" src="assets/elements.svg" alt="Expand" />
-        </article>
+          <img class="expand-icon" src="assets/elements.svg" alt="" aria-hidden="true" />
+        </button>
       </div>
 
     </div><!-- /hot-takes group -->
@@ -3039,6 +3042,22 @@
           'Someone raises a consideration you hadn\u2019t thought of. Someone else spots an accessibility gap or challenges an assumption you didn\u2019t realize you were making. Suddenly, a more thoughtful, intuitive, and inclusive solution starts to take shape. Because someone else\u2019s perspective is often the thing your design was missing.',
           'When it comes to design: we see clearer together than we ever could alone- a philosophy worth holding close in all aspects of life.'
         ]
+      },
+
+      /* ── What's Challenging ──────────────────────────────────────
+         To edit: update the paragraphs array below.
+         title      = header shown on desktop/tablet modal
+         titleMobile = header shown on mobile bottom sheet
+         paragraphs = array of plain strings, one per paragraph.
+         No bold (<strong>) in this modal per design spec.
+      ────────────────────────────────────────────────────────────── */
+      challenging: {
+        title: 'My Hot Takes - What\u2019s Challenging',
+        titleMobile: 'My Hot Takes - What\u2019s Hard',
+        paragraphs: [
+          'One sneaky challenge of design is learning to articulate and advocate for your decisions. It\u2019s not enough to present a thoughtful solution; you need to explain the reasoning behind the experience, justify the details, and communicate why each decision matters. Otherwise, good ideas can easily get lost in the shuffle.',
+          'Having a perspective is one thing. Developing it into a compelling point of view and communicating it effectively is an entirely different skill. It\u2019s a muscle that takes time and intention to build, and one I\u2019m still exercising every day.'
+        ]
       }
     };
 
@@ -3170,8 +3189,8 @@
       var bodyHtml = getBodyHtml(id);
 
       if (isMobile()) {
-        /* populate sheet */
-        sheetTitle.textContent = data.title;
+        /* populate sheet — use titleMobile if the entry defines one */
+        sheetTitle.textContent = data.titleMobile || data.title;
         sheetBody.innerHTML    = bodyHtml;
         /* mobile: headline is pinned above divider */
         if (id === 'ai') {
