@@ -1180,22 +1180,21 @@
       .work-placeholder-title { font-size: 18px; }
 
       /* AI Meet the Fed: tablet — Figma frame 316×180
-         explicit height matches the work-placeholder-card at this breakpoint.
-         All text/spacing in cqi so they scale proportionally with card width.
-         Calibrated: 6.33cqi title = 20px at 316px,
-                     3.16cqi eyebrow = 10px at 316px,
-                     3.8cqi  padding = ~12px at 316px */
+         explicit height 180px matches work-placeholder-card. All values in px.
+         Robot: estimated 200px wide (Figma tablet frame not accessible —
+         verify and adjust if needed). */
       .ai-fed-card {
         height: 180px;
-        padding: 3.8cqi;
-        gap: 2.5cqi;
+        padding: 12px;
+        gap: 6px;
         border-radius: 20px;
       }
-      .ai-fed-eyebrow { font-size: 3.16cqi; }
-      .ai-fed-title   { font-size: 6.33cqi; }
-      /* Robot: 65cqi ≈ 205px wide at 316px; height ≈ 203px > 180px
-         so bottom of robot clips naturally at card bottom edge */
-      .ai-fed-robot   { width: 65cqi; bottom: 0; right: 0; }
+      .ai-fed-eyebrow { font-size: 10px; }  /* Figma tablet spec */
+      .ai-fed-title   { font-size: 20px; }  /* Figma tablet spec */
+      /* Robot: estimated 200px wide × 197px tall at tablet (auto height).
+         right: 0 anchors to card right; overflow:hidden clips top overflow. */
+      .ai-fed-robot   { width: auto; left: auto; right: 0; bottom: 0; }
+      .ai-fed-robot img { width: 200px; height: auto; max-width: none; }
 
       /* Bookshelf: 24px radius, smaller title */
       .bookshelf-card { border-radius: 24px; }
@@ -1279,39 +1278,36 @@
       /* Work cards inherit from tablet */
       .work-placeholder-card { padding: 16px; }
 
-      /* AI Meet the Fed: mobile — Figma frame 160×180.
-         All spacing in cqi → proportional at any card width.
-         Live card is 167.5px at 375/390/430px viewports (capped by
-         max-width: 343px), so values are 4.7% larger than at 160px.
-         ─────────────────────────────────────────────────
-         Calibrated at 160px card:
-           8cqi    top padding    = 12.8px
-           5.5cqi  side padding   =  8.8px
-           2.5cqi  eyebrow→title gap = 4px
-           5cqi    eyebrow size   =  8px
-           9.375cqi title size    = 15px
-           10cqi   border-radius  = 16px  (lighter than 20px base)
-         ─────────────────────────────────────────────────
-         Eyebrow font: Inter 500, wide letter-spacing (0.15em).
-         Desktop uses IBM Plex Mono; mobile frame uses sans-serif. */
+      /* AI Meet the Fed: mobile — all values in explicit px per Figma spec.
+         No cqi for sizes/fonts: cqi references the content box (~150px),
+         not the border box (167.5px), so cqi calibrations came out ~6% short. */
+      /* Figma exact: eyebrow left=14.85px top=10.35px; title left=14.85px top=36.35px
+         → padding-left 15px, padding-top 10px, gap = 36.35−10.35−~19px ≈ 7px */
       .ai-fed-card {
         height: 180px;
-        padding: 8cqi 5.5cqi 5.5cqi;
-        gap: 2.5cqi;
-        border-radius: 20px;          /* matches all other work cards at mobile */
+        padding: 10px 8px 8px 15px;
+        gap: 7px;
+        border-radius: 20px;
         box-shadow: 0px 2px 8px rgba(12,12,13,0.07),
-                    0px 1px 2px rgba(12,12,13,0.04); /* lighter for compact card */
+                    0px 1px 2px rgba(12,12,13,0.04);
       }
       .ai-fed-eyebrow {
-        font-family: 'Inter', sans-serif; /* sans-serif per Figma mobile frame */
+        font-family: 'Inter', sans-serif;
         font-weight: 500;
-        font-size: 5cqi;               /* 8px at 160px */
-        letter-spacing: 0.15em;        /* wide spacing per design; scales with font */
+        font-size: 8px;
+        letter-spacing: 0.72px;  /* Figma inspect: tracking 0.72px */
+        line-height: normal;     /* Figma: leading normal, not 1.25 */
       }
-      .ai-fed-title   { font-size: 9.375cqi; } /* 15px at 160px */
-      /* Robot: 110cqi ≈ 176px at 160px (174px tall); card 180px →
-         robot nearly fills card height, bottom edge flush with card */
-      .ai-fed-robot   { width: 110cqi; bottom: 0; right: 0; }
+      .ai-fed-title {
+        font-size: 15px;
+        letter-spacing: -0.6px; /* Figma inspect: tracking -0.6px */
+      }
+      /* Robot: Figma W Fixed 130px × H Fixed 128px.
+         left: 40px per Figma (card-left to robot-left = 40px).
+         explicit 130×128px; max-width:none overrides global img { max-width:100% }.
+         Right edge at 40+130=170px; card is 167.5px → 2.5px bleed, clipped. */
+      .ai-fed-robot { width: auto; left: auto; right: 11px; bottom: 0; } /* mobile: 7% of 160px ≈ 11px */
+      .ai-fed-robot img { width: 130px; height: 128px; max-width: none; }
 
       /* Music + hyper: both full width within 343px bottom-row */
       .music-card, .hyper-card { width: 100%; padding: 20px; }
