@@ -790,6 +790,300 @@
     }
 
     /* =============================================
+       HOT TAKES MODAL + BOTTOM SHEET
+       ── Overlay (mobile only — dialog::backdrop handles desktop) ── */
+    .ht-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      z-index: 400;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.28s ease;
+    }
+    .ht-overlay.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ── Desktop/tablet modal ─────────────────── */
+    .ht-modal {
+      border: none;
+      padding: 0;
+      background: transparent;
+      max-width: 100vw;
+      max-height: 100dvh;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+    .ht-modal::backdrop {
+      background: rgba(0,0,0,0.35);
+      opacity: 0;
+      transition: opacity 0.28s ease;
+    }
+    .ht-modal[open]::backdrop {
+      opacity: 1;
+    }
+    .ht-modal__inner {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.97);
+      width: 540px;
+      max-width: calc(100vw - 32px);
+      max-height: 82dvh;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0px 16px 32px -4px rgba(12,12,13,0.1), 0px 4px 4px -4px rgba(12,12,13,0.05);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.34,1.1,0.64,1);
+    }
+    .ht-modal[open] .ht-modal__inner {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .ht-modal__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px 16px;
+      flex-shrink: 0;
+    }
+    .ht-modal__title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 1.4;
+      color: var(--text-muted2);
+      letter-spacing: 0.3px;
+    }
+    .ht-modal__close {
+      background: none;
+      border: none;
+      padding: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+    .ht-modal__close:focus-visible {
+      outline: 2px solid var(--text-dark);
+      outline-offset: 2px;
+    }
+    .ht-modal__close img {
+      width: 24px;
+      height: 24px;
+      display: block;
+    }
+    .ht-modal__body {
+      padding: 0 32px 32px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    /* ── Mobile bottom sheet ──────────────────── */
+    .ht-sheet {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border-radius: 24px 24px 0 0;
+      box-shadow: 0px -4px 24px rgba(12,12,13,0.1);
+      z-index: 401;
+      display: flex;
+      flex-direction: column;
+      max-height: 90dvh;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      /* hidden state */
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.34,1.05,0.64,1);
+      pointer-events: none;
+    }
+    .ht-sheet.is-open {
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .ht-sheet__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 20px 16px;
+      flex-shrink: 0;
+    }
+    .ht-sheet__title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 400;
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--text-muted2);
+      letter-spacing: 0.3px;
+    }
+    .ht-sheet__close {
+      background: none;
+      border: none;
+      padding: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+    .ht-sheet__close:focus-visible {
+      outline: 2px solid var(--text-dark);
+      outline-offset: 2px;
+    }
+    .ht-sheet__close img {
+      width: 20px;
+      height: 20px;
+      display: block;
+    }
+    .ht-sheet__headline {
+      padding: 0 20px 16px;
+      flex-shrink: 0;
+      font-family: 'Work Sans', sans-serif;
+      font-weight: 600;
+      font-size: 20px;
+      line-height: 1.25;
+      letter-spacing: -0.4px;
+      color: var(--text-dark);
+      text-align: center;
+    }
+    .ht-divider {
+      border: none;
+      border-top: 1px solid rgba(0,0,0,0.08);
+      margin: 0 20px;
+      flex-shrink: 0;
+    }
+    .ht-sheet__body {
+      padding: 20px 20px 8px;
+      overflow-y: auto;
+      flex: 1;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      /* thin visible scrollbar */
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0,0,0,0.18) transparent;
+    }
+    .ht-sheet__body::-webkit-scrollbar { width: 4px; }
+    .ht-sheet__body::-webkit-scrollbar-track { background: transparent; }
+    .ht-sheet__body::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,0.18);
+      border-radius: 2px;
+    }
+
+    /* ── Shared modal content typography ──────── */
+    .ht-headline {
+      font-family: 'Work Sans', sans-serif;
+      font-weight: 600;
+      font-size: 22px;
+      line-height: 1.25;
+      letter-spacing: -0.4px;
+      color: var(--text-dark);
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .ht-body-text {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--text-dark);
+    }
+    .ht-body-text p { margin-bottom: 14px; }
+    .ht-body-text p:last-child { margin-bottom: 0; }
+
+    /* ── Current Stack layout ─────────────────── */
+    .ht-stack-groups { display: flex; flex-direction: column; gap: 0; }
+    .ht-stack-group {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 0 20px;
+      padding: 20px 0;
+      border-top: 1px solid rgba(0,0,0,0.08);
+    }
+    .ht-stack-group:first-child { border-top: none; padding-top: 4px; }
+    .ht-stack-group__label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 500;
+      font-size: 11px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text-muted2);
+      padding-top: 2px;
+      line-height: 1.4;
+    }
+    .ht-stack-group__tools { display: flex; flex-direction: column; gap: 16px; }
+    .ht-tool {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .ht-tool__icon {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      flex-shrink: 0;
+      border-radius: 6px;
+    }
+    .ht-tool__icon-row {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .ht-tool__icon-row .ht-tool__icon { width: 28px; height: 28px; }
+    .ht-tool__info { flex: 1; }
+    .ht-tool__name {
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      line-height: 1.3;
+      color: var(--text-dark);
+      margin-bottom: 2px;
+    }
+    .ht-tool__desc {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+
+    /* ── "Why I Love/♡ Design" label switch ─────
+       At ≤776px (tablet + mobile) show the short ♡ label;
+       at desktop show the long label. Done in CSS with two
+       spans so the accessible name on the button is always
+       the full text, and no JS is involved. */
+    .ht-label-short { display: none; }
+    @media (max-width: 776px) {
+      .ht-label-long  { display: none; }
+      .ht-label-short { display: inline; }
+    }
+
+    /* ── Focus style on trigger buttons ──────── */
+    button.ht-trigger { text-align: center; }
+    button.ht-trigger:focus-visible {
+      outline: 2px solid var(--text-dark);
+      outline-offset: 3px;
+    }
+    button.ht-trigger:focus:not(:focus-visible) { outline: none; }
+
+    /* ── Mobile: single-column Current Stack ─── */
+    @media (max-width: 430px) {
+      .ht-stack-group {
+        grid-template-columns: 1fr;
+        gap: 10px 0;
+      }
+    }
+
+    /* =============================================
        TABLET BREAKPOINT  (≤776px — Figma tablet frame width)
        ============================================= */
     @media (max-width: 776px) {
@@ -1307,25 +1601,28 @@
 
       <!-- Hot Takes Row 1: AI + My Current Stack -->
       <div class="row-2col">
-        <article class="card hot-takes-card">
+        <button class="card hot-takes-card ht-trigger" data-modal="ai" aria-haspopup="dialog" type="button">
           <h2 class="hot-takes-title">AI</h2>
           <p class="hot-takes-label">My Hot Takes</p>
-          <img class="expand-icon" src="assets/elements.svg" alt="Expand" />
-        </article>
-        <article class="card hot-takes-card">
+          <img class="expand-icon" src="assets/elements.svg" alt="" aria-hidden="true" />
+        </button>
+        <button class="card hot-takes-card ht-trigger" data-modal="stack" aria-haspopup="dialog" type="button">
           <h2 class="hot-takes-title">My Current Stack</h2>
           <p class="hot-takes-label">My Hot Takes</p>
-          <img class="expand-icon" src="assets/elements.svg" alt="Expand" />
-        </article>
+          <img class="expand-icon" src="assets/elements.svg" alt="" aria-hidden="true" />
+        </button>
       </div>
 
       <!-- Hot Takes Row 2: I Love Most About Design + Say Things -->
       <div class="row-2col">
-        <article class="card hot-takes-card">
-          <h2 class="hot-takes-title">I Love Most About Design...</h2>
+        <button class="card hot-takes-card ht-trigger" data-modal="design" aria-haspopup="dialog" aria-label="Why I love design" type="button">
+          <h2 class="hot-takes-title">
+            <span class="ht-label-long">Why I Love Design</span>
+            <span class="ht-label-short" aria-hidden="true">Why I &#x2661; Design</span>
+          </h2>
           <p class="hot-takes-label">My Hot Takes</p>
-          <img class="expand-icon" src="assets/elements.svg" alt="Expand" />
-        </article>
+          <img class="expand-icon" src="assets/elements.svg" alt="" aria-hidden="true" />
+        </button>
         <article class="card hot-takes-card">
           <h2 class="hot-takes-title">Say Things</h2>
           <p class="hot-takes-label">My Hot Takes</p>
@@ -2543,6 +2840,383 @@
         var idx = openIdx; /* capture before closeAll resets it */
         closeAll(idx);     /* returns focus to the button that was open */
       }
+    });
+
+  })();
+  </script>
+
+  <!-- ── Hot Takes Overlay (mobile bottom-sheet backdrop) ──── -->
+  <div class="ht-overlay" id="htOverlay" aria-hidden="true"></div>
+
+  <!-- ── Hot Takes Modal (desktop/tablet) ──────────────────── -->
+  <dialog class="ht-modal" id="htModal" aria-modal="true">
+    <div class="ht-modal__inner">
+      <div class="ht-modal__header">
+        <span class="ht-modal__title" id="htModalTitle"></span>
+        <button class="ht-modal__close" aria-label="Close" type="button">
+          <img src="assets/modal-close-desktop.svg" alt="" aria-hidden="true" />
+        </button>
+      </div>
+      <div class="ht-modal__body" id="htModalBody"></div>
+    </div>
+  </dialog>
+
+  <!-- ── Hot Takes Bottom Sheet (mobile) ───────────────────── -->
+  <div class="ht-sheet" id="htSheet" role="dialog" aria-modal="true" aria-labelledby="htSheetTitle">
+    <div class="ht-sheet__header">
+      <span class="ht-sheet__title" id="htSheetTitle"></span>
+      <button class="ht-sheet__close" aria-label="Close" type="button">
+        <img src="assets/modal-close-mobile.svg" alt="" aria-hidden="true" />
+      </button>
+    </div>
+    <div class="ht-sheet__headline" id="htSheetHeadline"></div>
+    <hr class="ht-divider" />
+    <div class="ht-sheet__body" id="htSheetBody"></div>
+  </div>
+
+  <script>
+  (function () {
+    /* ═══════════════════════════════════════════════════════════════
+       HOT TAKES DATA
+       Edit the content blocks below. Structure must not change.
+       · In body paragraphs, wrap words in <strong> for bold.
+       · Paragraph breaks are separate entries in the paragraphs array.
+       · Stack groups: each group has a label and an array of tools.
+         Each tool has: name, icon (src), desc.
+         For the multi-icon row (Photoshop/AE/Premiere), use icons:[].
+    ═══════════════════════════════════════════════════════════════ */
+    var HT_DATA = {
+      ai: {
+        title: 'My Hot Takes - AI',
+        headline: '<strong>Design has always evolved alongside technology.</strong> The tools will continue to change, but the need for collaboration, empathetic imagining, and critical thinking isn\u2019t going anywhere.',
+        paragraphs: [
+          'AI isn\u2019t <strong>breaking</strong> the design process, but it is <strong>changing</strong> it. And it may be exposing dysfunction that already exists within organizations, while amplifying the strengths of the teams using it well.',
+          'AI has lowered the barrier to producing designs and more people participating in the creative process can be <strong>incredibly</strong> valuable.',
+          'But, if your org <strong>already struggles</strong> with unclear ownership, inconsistent product direction, or shaky design thinking, AI will make those problems considerably louder.',
+          'AI also doesn\u2019t necessarily make everyone a better designer; in my experience, it seems to make everyone\u2019s existing capabilities and gaps in knowledge more visible.',
+          '<strong>Two people can use the exact same tools and produce vastly different outcomes.</strong>',
+          'Ultimately, I believe AI can amplify creativity, help high-performing teams move faster, and, most notably, free up capacity for valuable parts of the design process that may have been previously sacrificed due to constraints. *whispers* \u2026like the research us UXers love to go on and on about.',
+          'Perhaps the biggest opportunity isn\u2019t just using AI to produce more faster, but also <strong>using it to make room for more of the thinking that distinguishes good work from excellent work.</strong>'
+        ]
+      },
+      stack: {
+        title: 'My Hot Takes - My Current Tool Stack',
+        groups: [
+          {
+            label: 'Think & Align',
+            tools: [
+              {
+                name: 'Marker and White Board',
+                icon: 'assets/marker-whiteboard-icon.png',
+                desc: 'Tried and true. Map complex flows, untangle ideas, and get everyone on the same page before jumping into the details'
+              },
+              {
+                name: 'Claude \u2014 Chat and Cowork',
+                icon: 'assets/claude-icon.png',
+                desc: 'My sounding board for pressure testing ideas, and occasionally unsticking a tangled mind'
+              }
+            ]
+          },
+          {
+            label: 'Design & Iterate',
+            tools: [
+              {
+                name: 'Figma',
+                icon: 'assets/figma-icon.png',
+                desc: 'Early wireframes to high-fidelity mocks, I still spend a good chunk of my time here \u2014 I still love you, Figma!'
+              },
+              {
+                name: 'Claude \u2014 Code and Design',
+                icon: 'assets/claude-icon.png',
+                desc: 'Building functional prototypes and exploring interactions, and accelerating design exploration beyond static mockups'
+              }
+            ]
+          },
+          {
+            label: 'Creating from Scratch',
+            tools: [
+              {
+                name: 'Photoshop, After Effects, Premiere',
+                icons: ['assets/photoshop-logo.png', 'assets/after-effects-logo.png', 'assets/premiere-logo.png'],
+                desc: 'Bonus round for when the work just calls for something more custom \u2014 I can get into the weeds with custom imagery and animation'
+              }
+            ]
+          }
+        ]
+      }
+      ,
+      design: {
+        title: 'My Hot Takes - Why I Love Design',
+        paragraphs: [
+          'My favorite part of design is learning from others. Everyone brings a different set of experiences, contexts, and perspectives to the table, and I love seeing how those differences shape the way we approach a problem.',
+          'Someone raises a consideration you hadn\u2019t thought of. Someone else spots an accessibility gap or challenges an assumption you didn\u2019t realize you were making. Suddenly, a more thoughtful, intuitive, and inclusive solution starts to take shape. Because someone else\u2019s perspective is often the thing your design was missing.',
+          'When it comes to design: we see clearer together than we ever could alone- a philosophy worth holding close in all aspects of life.'
+        ]
+      }
+    };
+
+    /* ── DOM refs ──────────────────────────────────────────────── */
+    var overlay    = document.getElementById('htOverlay');
+    var modal      = document.getElementById('htModal');
+    var modalTitle = document.getElementById('htModalTitle');
+    var modalBody  = document.getElementById('htModalBody');
+    var modalClose = modal.querySelector('.ht-modal__close');
+    var sheet      = document.getElementById('htSheet');
+    var sheetTitle     = document.getElementById('htSheetTitle');
+    var sheetHeadline  = document.getElementById('htSheetHeadline');
+    var sheetBody      = document.getElementById('htSheetBody');
+    var sheetClose     = sheet.querySelector('.ht-sheet__close');
+    var triggers   = Array.from(document.querySelectorAll('.ht-trigger'));
+
+    /* ── State ─────────────────────────────────────────────────── */
+    var activeModalId  = null; /* 'ai' | 'stack' | null */
+    var activeTrigger  = null;
+    var scrollLockY    = 0;
+
+    /* ── Breakpoint helper (reads CSS, never hardcodes px) ──────── */
+    function isMobile() {
+      return getComputedStyle(document.documentElement)
+        .getPropertyValue('--breakpoint').trim().replace(/['"]/g,'') === 'mobile';
+    }
+
+    /* ── Build modal body HTML ──────────────────────────────────── */
+    function buildAiBody() {
+      var data = HT_DATA.ai;
+      var html = '<div class="ht-headline">' + data.headline + '</div>';
+      html += '<div class="ht-body-text">';
+      data.paragraphs.forEach(function (p) { html += '<p>' + p + '</p>'; });
+      html += '</div>';
+      return html;
+    }
+
+    function buildStackBody() {
+      var data = HT_DATA.stack;
+      var html = '<div class="ht-stack-groups">';
+      data.groups.forEach(function (group) {
+        html += '<div class="ht-stack-group">';
+        html += '<div class="ht-stack-group__label">' + group.label + '</div>';
+        html += '<div class="ht-stack-group__tools">';
+        group.tools.forEach(function (tool) {
+          html += '<div class="ht-tool">';
+          if (tool.icons) {
+            html += '<div class="ht-tool__icon-row">';
+            tool.icons.forEach(function (src) {
+              html += '<img class="ht-tool__icon" src="' + src + '" alt="" aria-hidden="true" />';
+            });
+            html += '</div>';
+          } else {
+            html += '<img class="ht-tool__icon" src="' + tool.icon + '" alt="" aria-hidden="true" />';
+          }
+          html += '<div class="ht-tool__info">';
+          html += '<div class="ht-tool__name">' + tool.name + '</div>';
+          html += '<div class="ht-tool__desc">' + tool.desc + '</div>';
+          html += '</div></div>';
+        });
+        html += '</div></div>';
+      });
+      html += '</div>';
+      return html;
+    }
+
+    function buildDesignBody() {
+      var data = HT_DATA.design;
+      var html = '<div class="ht-body-text">';
+      data.paragraphs.forEach(function (p) { html += '<p>' + p + '</p>'; });
+      html += '</div>';
+      return html;
+    }
+
+    function getBodyHtml(id) {
+      if (id === 'ai')     return buildAiBody();
+      if (id === 'stack')  return buildStackBody();
+      return buildDesignBody();
+    }
+
+    /* ── Scroll lock (iOS-safe) ─────────────────────────────────── */
+    function lockScroll() {
+      scrollLockY = window.scrollY;
+      document.body.style.position   = 'fixed';
+      document.body.style.top        = '-' + scrollLockY + 'px';
+      document.body.style.width      = '100%';
+      document.body.style.overflowY  = 'scroll'; /* keep scrollbar width */
+    }
+    function unlockScroll() {
+      document.body.style.position  = '';
+      document.body.style.top       = '';
+      document.body.style.width     = '';
+      document.body.style.overflowY = '';
+      window.scrollTo(0, scrollLockY);
+    }
+
+    /* ── Focus trap ─────────────────────────────────────────────── */
+    function getFocusable(container) {
+      return Array.from(container.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )).filter(function (el) { return !el.disabled && el.offsetParent !== null; });
+    }
+    function trapFocus(container, e) {
+      var els = getFocusable(container);
+      if (!els.length) return;
+      var first = els[0], last = els[els.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    }
+
+    /* ── Open ───────────────────────────────────────────────────── */
+    function openModal(id, trigger) {
+      activeModalId = id;
+      activeTrigger = trigger;
+      var data   = HT_DATA[id];
+      var bodyHtml = getBodyHtml(id);
+
+      if (isMobile()) {
+        /* populate sheet */
+        sheetTitle.textContent = data.title;
+        sheetBody.innerHTML    = bodyHtml;
+        /* mobile: headline is pinned above divider */
+        if (id === 'ai') {
+          sheetHeadline.innerHTML = HT_DATA.ai.headline;
+          sheetHeadline.style.display = '';
+          /* remove headline from scrolling body (it's in the fixed zone) */
+          var hEl = sheetBody.querySelector('.ht-headline');
+          if (hEl) hEl.remove();
+        } else {
+          sheetHeadline.style.display = 'none';
+        }
+        sheetBody.scrollTop = 0;
+        lockScroll();
+        overlay.setAttribute('aria-hidden', 'false');
+        overlay.classList.add('is-open');
+        sheet.classList.add('is-open');
+        sheet.removeAttribute('aria-hidden');
+        /* move focus to close button */
+        requestAnimationFrame(function () { sheetClose.focus(); });
+      } else {
+        /* populate modal */
+        modalTitle.textContent = data.title;
+        modalBody.innerHTML    = bodyHtml;
+        modalBody.scrollTop    = 0;
+        lockScroll();
+        modal.showModal();
+        /* move focus to close button after transition starts */
+        requestAnimationFrame(function () { modalClose.focus(); });
+      }
+    }
+
+    /* ── Close ──────────────────────────────────────────────────── */
+    function closeModal() {
+      if (!activeModalId) return;
+      var wasMobile = sheet.classList.contains('is-open');
+
+      if (wasMobile) {
+        sheet.classList.remove('is-open');
+        sheet.setAttribute('aria-hidden', 'true');
+        overlay.classList.remove('is-open');
+        overlay.setAttribute('aria-hidden', 'true');
+      } else {
+        modal.close();
+      }
+
+      unlockScroll();
+      if (activeTrigger) activeTrigger.focus();
+      activeModalId = null;
+      activeTrigger = null;
+    }
+
+    /* ── Resize: switch layout without closing ──────────────────── */
+    var lastIsMobile = isMobile();
+    window.addEventListener('resize', function () {
+      var nowMobile = isMobile();
+      if (nowMobile === lastIsMobile) return;
+      lastIsMobile = nowMobile;
+      if (!activeModalId) return;
+
+      /* Save scroll position relative to content height */
+      var id = activeModalId;
+      var trigger = activeTrigger;
+      var scrollRatio = 0;
+
+      if (!nowMobile && sheet.classList.contains('is-open')) {
+        /* was sheet, switch to modal */
+        var sb = sheetBody;
+        scrollRatio = sb.scrollHeight > 0 ? sb.scrollTop / sb.scrollHeight : 0;
+        sheet.classList.remove('is-open');
+        sheet.setAttribute('aria-hidden', 'true');
+        overlay.classList.remove('is-open');
+        overlay.setAttribute('aria-hidden', 'true');
+        var data = HT_DATA[id];
+        modalTitle.textContent = data.title;
+        modalBody.innerHTML    = getBodyHtml(id);
+        modal.showModal();
+        requestAnimationFrame(function () {
+          modalBody.scrollTop = scrollRatio * modalBody.scrollHeight;
+          modalClose.focus();
+        });
+      } else if (nowMobile && modal.open) {
+        /* was modal, switch to sheet */
+        scrollRatio = modalBody.scrollHeight > 0 ? modalBody.scrollTop / modalBody.scrollHeight : 0;
+        modal.close();
+        var data2 = HT_DATA[id];
+        sheetTitle.textContent = data2.title;
+        sheetBody.innerHTML    = getBodyHtml(id);
+        if (id === 'ai') {
+          sheetHeadline.innerHTML = HT_DATA.ai.headline;
+          sheetHeadline.style.display = '';
+          var hEl2 = sheetBody.querySelector('.ht-headline');
+          if (hEl2) hEl2.remove();
+        } else {
+          sheetHeadline.style.display = 'none';
+        }
+        overlay.setAttribute('aria-hidden', 'false');
+        overlay.classList.add('is-open');
+        sheet.classList.add('is-open');
+        sheet.removeAttribute('aria-hidden');
+        requestAnimationFrame(function () {
+          sheetBody.scrollTop = scrollRatio * sheetBody.scrollHeight;
+          sheetClose.focus();
+        });
+      }
+    });
+
+    /* ── Trigger clicks ─────────────────────────────────────────── */
+    triggers.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        openModal(btn.dataset.modal, btn);
+      });
+    });
+
+    /* ── Close button clicks ────────────────────────────────────── */
+    modalClose.addEventListener('click', closeModal);
+    sheetClose.addEventListener('click', closeModal);
+
+    /* ── Overlay click (mobile) ─────────────────────────────────── */
+    overlay.addEventListener('click', closeModal);
+
+    /* ── Backdrop click (desktop dialog) ────────────────────────── */
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal) closeModal();
+    });
+
+    /* ── Escape key ─────────────────────────────────────────────── */
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && activeModalId) {
+        /* native dialog already fires cancel on Escape — intercept to use our close */
+        e.preventDefault();
+        closeModal();
+      }
+      if (e.key === 'Tab' && activeModalId) {
+        var container = sheet.classList.contains('is-open') ? sheet : modal;
+        trapFocus(container, e);
+      }
+    });
+
+    /* native dialog cancel (Escape) → use our close for scroll unlock */
+    modal.addEventListener('cancel', function (e) {
+      e.preventDefault();
+      closeModal();
     });
 
   })();
