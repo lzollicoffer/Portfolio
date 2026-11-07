@@ -293,7 +293,10 @@
       gap: 8px;
       padding: 32px;
       min-height: 190px;
+      cursor: pointer; /* UA stylesheet sets default on <button>; override here */
     }
+    /* Ensure pointer shows over every child (title, label, expand icon) */
+    .hot-takes-card * { cursor: pointer; }
     .hot-takes-title {
       font-family: 'Work Sans', sans-serif;
       font-weight: 600;
@@ -3134,17 +3137,23 @@
       return html;
     }
 
-    function buildDesignBody() {
-      var data = HT_DATA.design;
+    /* Generic builder for paragraph-only modals (design, challenging, …).
+       Pass the HT_DATA entry directly — no hardcoded key. */
+    function buildParagraphBody(data) {
       var html = '<div class="ht-body-text">';
       data.paragraphs.forEach(function (p) { html += '<p>' + p + '</p>'; });
       html += '</div>';
       return html;
     }
 
+    function buildDesignBody() {
+      return buildParagraphBody(HT_DATA.design);
+    }
+
     function getBodyHtml(id) {
-      if (id === 'ai')     return buildAiBody();
-      if (id === 'stack')  return buildStackBody();
+      if (id === 'ai')           return buildAiBody();
+      if (id === 'stack')        return buildStackBody();
+      if (id === 'challenging')  return buildParagraphBody(HT_DATA.challenging);
       return buildDesignBody();
     }
 
