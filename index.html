@@ -3157,20 +3157,44 @@
       return buildDesignBody();
     }
 
-    /* ── Scroll lock (iOS-safe) ─────────────────────────────────── */
+    /* ── Scroll lock ────────────────────────────────────────────────
+       Desktop/tablet: overflow:hidden on <html> + scrollbar-gutter:stable
+       so the page never moves and the scrollbar gutter doesn't shift.
+       iOS Safari ignores overflow:hidden on html, so we also apply the
+       position:fixed body trick there, detected via the 'mobile' breakpoint
+       (iOS phones always hit the mobile breakpoint in this layout).
+    ───────────────────────────────────────────────────────────────── */
     function lockScroll() {
       scrollLockY = window.scrollY;
-      document.body.style.position   = 'fixed';
-      document.body.style.top        = '-' + scrollLockY + 'px';
-      document.body.style.width      = '100%';
-      document.body.style.overflowY  = 'scroll'; /* keep scrollbar width */
+      if (isMobile()) {
+        /* iOS: position:fixed is the only reliable lock */
+        document.body.style.position  = 'fixed';
+        document.body.style.top       = '-' + scrollLockY + 'px';
+        document.body.style.width     = '100%';
+        document.body.style.overflowY = 'scroll';
+      } else {
+        /* Desktop/tablet: lock without moving the page */
+        document.documentElement.style.overflow        = 'hidden';
+        document.documentElement.style.scrollbarGutter = 'stable';
+      }
     }
     function unlockScroll() {
-      document.body.style.position  = '';
-      document.body.style.top       = '';
-      document.body.style.width     = '';
-      document.body.style.overflowY = '';
-      window.scrollTo(0, scrollLockY);
+      if (isMobile()) {
+        /* Suppress smooth-scroll while restoring so the browser doesn't
+           animate from y=0 back to the saved position (the double-jump).
+           We clear position:fixed (which snaps to y=0), immediately set
+           scroll-behavior:auto, scrollTo synchronously, then restore. */
+        document.body.style.position  = '';
+        document.body.style.top       = '';
+        document.body.style.width     = '';
+        document.body.style.overflowY = '';
+        document.documentElement.style.scrollBehavior = 'auto';
+        window.scrollTo(0, scrollLockY);
+        document.documentElement.style.scrollBehavior = '';
+      } else {
+        document.documentElement.style.overflow        = '';
+        document.documentElement.style.scrollbarGutter = '';
+      }
     }
 
     /* ── Focus trap ─────────────────────────────────────────────── */
@@ -3248,7 +3272,8 @@
       }
 
       unlockScroll();
-      if (activeTrigger) activeTrigger.focus();
+      /* preventScroll: true so returning focus doesn't trigger another scroll */
+      if (activeTrigger) activeTrigger.focus({ preventScroll: true });
       activeModalId = null;
       activeTrigger = null;
     }
