@@ -734,62 +734,84 @@
     /* =============================================
        HYPERFIXATION CARD — POLAROID FRAMES
        ============================================= */
-    .hyper-card {
+    /* =============================================
+       NOVEL CARD (Current Sidequest, Novel-ing)
+       ============================================= */
+    .novel-card {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 24px;
-      padding: 32px;
-      min-height: 616px;
-      justify-content: center;
+      gap: 25px;
+      padding: 24px 24px 24px 32px;
+      /* No fixed height: the row-2col grid stretches this card to match the
+         records card height automatically (align-items: stretch is default).
+         The image uses flex:1 to fill whatever space that leaves. */
+      overflow: hidden;
     }
-    .hyper-card-header {
+    .novel-card__header {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 16px;
+      width: 100%;
+    }
+    .novel-card__titles {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      width: 100%;
+    }
+    .novel-card__title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 300;
+      font-size: 32px;
+      line-height: 40px;
+      letter-spacing: 0.1px;
+      color: #000;
       text-align: center;
       width: 100%;
     }
-    /* Scattered polaroid layout */
-    .polaroid-scatter {
-      position: relative;
-      width: 360px;
-      max-width: 100%;
-      min-height: 440px;
-    }
-    .polaroid {
-      position: absolute;
-      background: #fff;
-      /* equal border on 3 sides, larger at bottom — classic Polaroid */
-      padding: 10px 10px 32px 10px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.10);
-      border-radius: 2px;
-    }
-    .polaroid-photo {
-      width: 148px;
-      height: 148px;
-      background: #d1d5db;
-      border-radius: 1px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .polaroid-caption {
-      font-family: 'IBM Plex Mono', monospace;
-      font-weight: 400;
-      font-size: 10px;
-      color: #596254;
+    .novel-card__subhead {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 300;
+      font-size: 24px;
+      line-height: 40px;
+      letter-spacing: 0.1px;
+      color: #000;
       text-align: center;
-      margin-top: 8px;
-      line-height: 1.4;
-      width: 148px;
+      width: 100%;
     }
-    /* Individual positions & rotations */
-    .polaroid-a { top: 0px;   left: 10px;  transform: rotate(-4deg); z-index: 1; }
-    .polaroid-b { top: 10px;  left: 180px; transform: rotate(3.5deg); z-index: 2; }
-    .polaroid-c { top: 220px; left: 0px;   transform: rotate(2deg); z-index: 3; }
-    .polaroid-d { top: 205px; left: 165px; transform: rotate(-3deg); z-index: 4; }
+    .novel-card__image {
+      /* Grows to fill space between header and caption.
+         aspect-ratio keeps the portrait shape of the photo (1362:1752).
+         align-items:center on parent centers it if narrower than card width.
+         max-width:100% prevents overflow on narrow cards. */
+      flex: 1 1 0;
+      min-height: 0;      /* required: lets a flex-grow item shrink below content size */
+      aspect-ratio: 1362 / 1752;
+      max-width: 100%;
+      border-radius: 7px;
+      box-shadow: 0px 16px 32px -8px rgba(12,12,13,0.4);
+      overflow: hidden;
+    }
+    .novel-card__image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;  /* box has same ratio as image → no actual crop */
+      display: block;
+      pointer-events: none;
+    }
+    .novel-card__caption {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 500;
+      font-size: 12px;
+      line-height: normal;
+      letter-spacing: 0.96px;
+      color: #6e7366;
+      text-align: center;
+      width: 100%;
+    }
 
     /* =============================================
        SECTION GROUPING (Work + Hot Takes interleaved)
@@ -1206,31 +1228,14 @@
       /* Music card */
       .music-card { min-height: auto; }
 
-      /* Hyperfixation: horizontal row of polaroids, container hugs content */
-      .hyper-card {
-        min-height: auto;
-        padding: 24px 20px;
+      /* Novel card: stacked at tablet — fixed photo size from Figma tablet frame
+         (292×390px same as desktop). Card height comes from content, not grid stretch. */
+      .novel-card__image {
+        flex: none;
+        aspect-ratio: auto;
+        width: 292px;
+        height: 390px;
       }
-      .polaroid-scatter {
-        position: static;
-        min-height: unset;
-        width: 100%;
-        display: flex;
-        flex-direction: row;
-        gap: 10px;
-        justify-content: flex-start;
-        align-items: flex-start;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-      }
-      .polaroid { position: static; }
-      .polaroid-a, .polaroid-b, .polaroid-c, .polaroid-d {
-        transform: none;
-        top: auto;
-        left: auto;
-      }
-      .polaroid-photo { width: 96px; height: 96px; }
-      .polaroid-caption { width: 96px; }
     }
 
     /* =============================================
@@ -1312,34 +1317,20 @@
       .ai-fed-robot { width: auto; left: auto; right: 11px; bottom: 0; } /* mobile: 7% of 160px ≈ 11px */
       .ai-fed-robot img { width: 130px; height: 128px; max-width: none; }
 
-      /* Music + hyper: both full width within 343px bottom-row */
-      .music-card, .hyper-card { width: 100%; padding: 20px; }
+      /* Music + novel: both full width within 343px bottom-row */
+      .music-card, .novel-card { width: 100%; }
 
-      /* Hyper card: fixed 311px height, polaroids scroll horizontally */
-      .hyper-card {
-        height: 311px;
-        min-height: unset;
-        overflow: hidden;
-        justify-content: flex-start;
-        gap: 12px;
+      /* Novel card: mobile — Figma frame 343×481 */
+      .novel-card {
+        height: 481px;
+        padding: 24px 24px 24px 32px;
+        gap: 25px;
       }
-      .hyper-card .polaroid-scatter {
-        overflow-x: auto;
-        overflow-y: visible;
-        flex-wrap: nowrap;
-        width: 100%;
-        gap: 8px;
-        justify-content: flex-start;
-        padding-bottom: 8px; /* space for scrollbar */
-        -webkit-overflow-scrolling: touch;
-      }
-      .hyper-card .polaroid {
-        flex-shrink: 0;
-        width: 124px;
-        padding: 7px 7px 24px 7px;
-      }
-      .hyper-card .polaroid-photo { width: 110px; height: 120px; }
-      .hyper-card .polaroid-caption { width: 110px; }
+      .novel-card__title   { font-size: 22px; line-height: 28px; }
+      .novel-card__subhead { font-size: 22px; line-height: 28px; }
+      /* Mobile: fixed size per Figma; reset flex-grow and aspect-ratio */
+      .novel-card__image   { flex: none; aspect-ratio: auto; width: 219px; height: 292px; }
+      .novel-card__caption { font-size: 10px; letter-spacing: 0.8px; }
 
       .section-title-outfit { font-size: 22px; }
       .section-subtitle-mono { font-size: 10px; letter-spacing: 0.8px; }
@@ -2115,31 +2106,23 @@
       </article>
 
       <!-- Hyperfixation Card -->
-      <article class="card hyper-card">
-        <div class="hyper-card-header">
-          <h2 class="section-title-outfit">Most recent hyperfixation</h2>
-          <p class="section-subtitle-mono" style="letter-spacing:0.5px; font-size:14px; text-align:center;">Unique Jewelry Hunting</p>
-        </div>
-
-        <!-- Polaroid frames (placeholder, to be filled with real photos) -->
-        <div class="polaroid-scatter">
-          <div class="polaroid polaroid-a">
-            <div class="polaroid-photo"></div>
-            <p class="polaroid-caption">alt caption here</p>
-          </div>
-          <div class="polaroid polaroid-b">
-            <div class="polaroid-photo"></div>
-            <p class="polaroid-caption">alt caption here</p>
-          </div>
-          <div class="polaroid polaroid-c">
-            <div class="polaroid-photo"></div>
-            <p class="polaroid-caption">alt caption here</p>
-          </div>
-          <div class="polaroid polaroid-d">
-            <div class="polaroid-photo"></div>
-            <p class="polaroid-caption">alt caption here</p>
+      <article class="card novel-card">
+        <div class="novel-card__header">
+          <div class="novel-card__titles">
+            <p class="novel-card__title">Current Sidequest,</p>
+            <p class="novel-card__subhead">Novel-ing</p>
           </div>
         </div>
+        <div class="novel-card__image">
+          <img
+            src="assets/novel-writing.png"
+            alt="A laptop open to a writing document on a café table, with a glass of espresso and flowers in the background"
+            width="1362"
+            height="1752"
+            loading="lazy"
+          />
+        </div>
+        <p class="novel-card__caption">Currently plotting, rewriting, overthinking, occasionally questioning why I decided to try this in the first place.</p>
       </article>
 
     </section>
