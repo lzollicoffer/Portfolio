@@ -741,18 +741,18 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 25px;
+      gap: 16px;        /* line-to-photo gap */
       padding: 24px 24px 24px 32px;
       /* No fixed height: the row-2col grid stretches this card to match the
          records card height automatically (align-items: stretch is default).
          The image uses flex:1 to fill whatever space that leaves. */
-      overflow: hidden;
+      overflow: visible; /* allow box-shadow on image to bleed past card edge */
     }
-    .novel-card__header {
+    .novel-card__top {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
+      gap: 4px;         /* title-to-line gap */
       width: 100%;
     }
     .novel-card__titles {
@@ -1275,8 +1275,8 @@
       /* Quick link icon sizes per Figma spec */
       .row-4col > :nth-child(1) img { width: 80px !important; height: 53.75px !important; max-width: unset !important; max-height: unset !important; object-fit: contain; }
       .row-4col > :nth-child(1) p  { font-size: 11px; }
-      .row-4col > :nth-child(2) img { width: 80px !important; height: 80px !important; max-width: unset !important; max-height: unset !important; object-fit: contain; }
-      .row-4col > :nth-child(3) img { width: 72px !important; height: 54px !important; max-width: unset !important; max-height: unset !important; object-fit: contain; }
+      .row-4col > :nth-child(2) img { width: 68px !important; height: 68px !important; max-width: unset !important; max-height: unset !important; object-fit: contain; }
+      .row-4col > :nth-child(3) img { width: 61px !important; height: 46px !important; max-width: unset !important; max-height: unset !important; object-fit: contain; }
       .row-4col > :nth-child(4) img { width: 89.5px !important; height: 89.5px !important; max-width: unset !important; max-height: unset !important; object-fit: contain; }
 
       /* Hot takes: 76px height, hide expand arrows */
@@ -1324,7 +1324,7 @@
       .novel-card {
         height: 481px;
         padding: 24px 24px 24px 32px;
-        gap: 25px;
+        gap: 16px;      /* matches base: line-to-photo gap */
       }
       .novel-card__title   { font-size: 22px; line-height: 28px; }
       .novel-card__subhead { font-size: 22px; line-height: 28px; }
@@ -1521,16 +1521,16 @@
     .bd-desc {
       font-family: 'Inter', sans-serif;
       font-weight: 400;
-      font-size: 11px;
+      font-size: 13px;
       line-height: 1.5;
       color: var(--text-dark);
       margin: 0;
       word-break: break-word;
       overflow-wrap: break-word;
-      /* Safety net: cap at 5 lines with ellipsis */
+      /* Safety net: cap at 6 lines with ellipsis */
       display: -webkit-box;
       -webkit-box-orient: vertical;
-      -webkit-line-clamp: 5;
+      -webkit-line-clamp: 6;
       overflow: hidden;
     }
 
@@ -1594,7 +1594,7 @@
 
       <!-- LinkedIn -->
       <a href="https://www.linkedin.com/in/lexxiana-zollicoffer-446645b2/" target="_blank" rel="noopener" class="card quick-link-card">
-        <img src="assets/image30.png" alt="LinkedIn" style="max-height:143px; max-width:143px;" />
+        <img src="assets/image30.png" alt="LinkedIn" style="max-height:122px; max-width:122px;" />
       </a>
 
       <!-- Gmail — copies email to clipboard -->
@@ -1602,7 +1602,7 @@
          class="card quick-link-card gmail-copy"
          style="position:relative;"
          onclick="event.preventDefault();navigator.clipboard.writeText('lexxiana.z@gmail.com').then(()=>{this.setAttribute('data-copied','true');setTimeout(()=>this.removeAttribute('data-copied'),2000)});">
-        <img src="assets/image31.png" alt="Email / Gmail" style="max-height:96px; max-width:128px;" />
+        <img src="assets/image31.png" alt="Email / Gmail" style="max-height:82px; max-width:109px;" />
       </a>
 
       <!-- Resume — not yet linked -->
@@ -2107,11 +2107,12 @@
 
       <!-- Hyperfixation Card -->
       <article class="card novel-card">
-        <div class="novel-card__header">
+        <div class="novel-card__top">
           <div class="novel-card__titles">
             <p class="novel-card__title">Current Sidequest,</p>
             <p class="novel-card__subhead">Novel-ing</p>
           </div>
+          <p class="novel-card__caption">Currently plotting, rewriting, overthinking, occasionally questioning why I decided to try this in the first place.</p>
         </div>
         <div class="novel-card__image">
           <img
@@ -2122,7 +2123,6 @@
             loading="lazy"
           />
         </div>
-        <p class="novel-card__caption">Currently plotting, rewriting, overthinking, occasionally questioning why I decided to try this in the first place.</p>
       </article>
 
     </section>
