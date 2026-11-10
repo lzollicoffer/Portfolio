@@ -1357,7 +1357,9 @@
 
       /* BG&E: needs 215px to show all 6 description lines at 13px/1.5 */
       .book-slot[data-book="1"] > button.book-spine { height: 215px !important; }
-      /* Grow shelf row to accommodate 215px spine (base is 200px) */
+      /* Mismatch: needs 215px to show full description (cuts off at "people") */
+      .book-slot[data-book="11"] > button.book-spine { height: 215px !important; }
+      /* Grow shelf row to accommodate 215px spines (base is 200px) */
       .bookshelf-row { height: 220px; }
     }
     /* =============================================
